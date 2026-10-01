@@ -15,22 +15,49 @@
       if(message){err.textContent=message;err.style.display='block';}
     }
     function hideLogin(){screen.style.display='none';logout.style.display='block';}
+    async function withTimeout(promise,ms,label){
+      let timer;
+      try{
+        return await Promise.race([
+          promise,
+          new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+' demorou mais de '+Math.round(ms/1000)+' segundos.')),ms);})
+        ]);
+      }finally{clearTimeout(timer);}
+    }
     async function checkAdmin(session){
       if(!session){showLogin();return false;}
-      const {data:profileData,error}=await sb.rpc('cltur_get_my_profile');
-      if(error){console.error('CL TUR auth profile error:',error);showLogin('Não foi possível validar seu acesso. Verifique a configuração do Supabase.');return false;}
-      const profile=Array.isArray(profileData)?profileData[0]:profileData;
-      if(!profile || profile.ativo!==true || profile.cargo!=='Administrador'){
-        await sb.auth.signOut(); showLogin('Este usuário não possui acesso administrativo.'); return false;
+      try{
+        const {data:profileData,error}=await withTimeout(sb.rpc('cltur_get_my_profile'),10000,'Validação do perfil');
+        if(error) throw error;
+        const profile=Array.isArray(profileData)?profileData[0]:profileData;
+        console.log('CL TUR perfil retornado:',profile);
+        if(!profile || profile.ativo!==true || profile.cargo!=='Administrador'){
+          await sb.auth.signOut();
+          showLogin('Seu usuário entrou, mas o perfil administrativo não foi reconhecido.');
+          return false;
+        }
+        hideLogin(); return true;
+      }catch(error){
+        console.error('CL TUR auth error:',error);
+        const detail=error?.message||error?.details||'Erro desconhecido';
+        showLogin('Erro ao validar o acesso: '+detail);
+        return false;
       }
-      hideLogin(); return true;
     }
     form.addEventListener('submit',async function(e){
       e.preventDefault(); err.style.display='none'; btn.disabled=true; btn.textContent='Entrando...';
       const email=document.getElementById('cltur-email').value.trim();
       const password=document.getElementById('cltur-password').value;
-      const {data,error}=await sb.auth.signInWithPassword({email,password});
-      if(error){showLogin('E-mail ou senha inválidos.');btn.disabled=false;btn.textContent='Entrar';return;}
+      let result;
+      try{
+        result=await withTimeout(sb.auth.signInWithPassword({email,password}),10000,'Login');
+      }catch(error){
+        console.error('CL TUR login error:',error);
+        showLogin('O login demorou demais para responder. Verifique a conexão e tente novamente.');
+        btn.disabled=false;btn.textContent='Entrar';return;
+      }
+      const {data,error}=result;
+      if(error){console.error('CL TUR signIn error:',error);showLogin(error.message||'E-mail ou senha inválidos.');btn.disabled=false;btn.textContent='Entrar';return;}
       const ok=await checkAdmin(data.session);
       if(!ok){btn.disabled=false;btn.textContent='Entrar';return;}
       btn.disabled=false;btn.textContent='Entrar';
