@@ -1,6 +1,43 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+(function(){
+  const sb=window.clturSupabase;
+  const screen=document.getElementById('cltur-auth-screen');
+  const form=document.getElementById('cltur-auth-form');
+  const btn=document.getElementById('cltur-auth-btn');
+  const err=document.getElementById('cltur-auth-error');
+  const logout=document.getElementById('cltur-logout');
+  function showLogin(message){
+    screen.style.display='flex'; logout.style.display='none';
+    if(message){err.textContent=message;err.style.display='block';}
+  }
+  function hideLogin(){screen.style.display='none';logout.style.display='block';}
+  async function checkAdmin(session){
+    if(!session){showLogin();return false;}
+    const {data:profile,error}=await sb.from('profiles').select('id,nome,cargo,ativo').eq('id',session.user.id).maybeSingle();
+    if(error){showLogin('Não foi possível validar seu acesso. Tente novamente.');return false;}
+    if(!profile || profile.ativo!==true || profile.cargo!=='Administrador'){
+      await sb.auth.signOut(); showLogin('Este usuário não possui acesso administrativo.'); return false;
+    }
+    hideLogin(); return true;
+  }
+  form.addEventListener('submit',async function(e){
+    e.preventDefault(); err.style.display='none'; btn.disabled=true; btn.textContent='Entrando...';
+    const email=document.getElementById('cltur-email').value.trim();
+    const password=document.getElementById('cltur-password').value;
+    const {data,error}=await sb.auth.signInWithPassword({email,password});
+    if(error){showLogin('E-mail ou senha inválidos.');btn.disabled=false;btn.textContent='Entrar';return;}
+    const ok=await checkAdmin(data.session);
+    if(!ok){btn.disabled=false;btn.textContent='Entrar';return;}
+    btn.disabled=false;btn.textContent='Entrar';
+  });
+  logout.addEventListener('click',async()=>{await sb.auth.signOut();location.reload();});
+  sb.auth.onAuthStateChange(async(_event,session)=>{await checkAdmin(session);});
+  window.CLTUR_AUTH_READY=checkAdmin;
+  checkAdmin(null);
+})();
+</script>
 <script>
   // Configuração pública do Supabase. A Publishable Key pode ficar no frontend.
   window.CLTUR_SUPABASE_URL = 'https://vucunqfaeukskvurdvog.supabase.co';
@@ -23,7 +60,17 @@
 .report-summary-strip b{font-size:18px;color:var(--text)}
 .report-tables h3{margin:20px 0 10px}
 @media(max-width:900px){.report-summary-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.report-summary-strip div{border-right:0;border-bottom:1px solid var(--border)}.report-summary-strip div:last-child{border-bottom:0}}
-</style>
+<style>
+#cltur-auth-screen{position:fixed;inset:0;z-index:99999;background:#f5f7fa;display:flex;align-items:center;justify-content:center;padding:20px}
+.cltur-auth-card{width:min(420px,100%);background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:30px;box-shadow:0 18px 50px rgba(15,23,42,.12)}
+.cltur-auth-brand{font-size:24px;font-weight:800;color:#111827;margin-bottom:6px}.cltur-auth-sub{color:#6b7280;font-size:14px;margin-bottom:24px}
+.cltur-auth-card label{display:block;font-size:13px;font-weight:700;color:#374151;margin:14px 0 7px}
+.cltur-auth-card input{width:100%;padding:12px 13px;border:1px solid #d1d5db;border-radius:10px;font-size:15px;outline:none}
+.cltur-auth-card input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+#cltur-auth-btn{width:100%;margin-top:20px;padding:13px;border:0;border-radius:10px;background:#2563eb;color:#fff;font-weight:800;font-size:15px;cursor:pointer}
+#cltur-auth-btn:disabled{opacity:.65;cursor:wait}.cltur-auth-error{margin-top:14px;padding:10px 12px;border-radius:9px;background:#fef2f2;color:#b91c1c;font-size:13px;display:none}
+#cltur-logout{position:fixed;right:18px;bottom:18px;z-index:9000;border:0;border-radius:999px;background:#111827;color:#fff;padding:10px 15px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.16)}
+</style></style>
 <style>
 .excursion-image-field{grid-column:1/-1}.excursion-image-preview{display:flex;gap:16px;align-items:center;padding:14px;border:1px dashed #cbd5e1;border-radius:14px;background:#f8fafc}.excursion-image-preview img{width:150px;height:95px;object-fit:cover;border-radius:10px;border:1px solid #e2e8f0}.public-trip-card{overflow:hidden;padding:0!important;display:flex;flex-direction:column}.public-trip-cover{width:100%;height:180px;object-fit:cover;display:block;background:#eef4f8}.public-trip-card .public-trip-body{padding:18px}.public-trip-card .public-trip-meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.public-trip-card .public-trip-meta span{background:#eef5fa;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;color:#31506b}.public-trip-empty-cover{height:180px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#eaf4fa,#f8fafc);font-size:44px}.public-preview-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}.public-preview-head .muted{margin:4px 0 0}.trip-detail-image{width:100%;max-height:480px;object-fit:contain;border-radius:16px;background:#f3f6f9;border:1px solid #e5e7eb;display:block;margin-bottom:18px}.
 </style>
@@ -194,6 +241,19 @@ body{background:var(--bg)!important;color:var(--text)!important}
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
+<div id="cltur-auth-screen">
+  <form class="cltur-auth-card" id="cltur-auth-form">
+    <div class="cltur-auth-brand">CL TUR</div>
+    <div class="cltur-auth-sub">Acesso ao sistema administrativo</div>
+    <label for="cltur-email">E-mail</label>
+    <input id="cltur-email" type="email" autocomplete="username" placeholder="seu@email.com" required>
+    <label for="cltur-password">Senha</label>
+    <input id="cltur-password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+    <button id="cltur-auth-btn" type="submit">Entrar</button>
+    <div id="cltur-auth-error" class="cltur-auth-error"></div>
+  </form>
+</div>
+<button id="cltur-logout" type="button" style="display:none">Sair</button>
 <script>
 // Referências explícitas ao DOM para garantir que o Dashboard seja renderizado no carregamento/recarregamento.
 const main=document.getElementById('main');
