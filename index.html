@@ -1,1 +1,758 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CL TUR — Gestão</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f5f7fa;color:#18212b}.app{display:flex;min-height:100vh}.side{width:245px;background:#111827;color:#fff;padding:20px 14px;position:fixed;inset:0 auto 0 0}.brand{display:flex;align-items:center;gap:10px;padding:8px 10px 22px;border-bottom:1px solid #263142;margin-bottom:14px}.brand img{width:48px;height:48px;border-radius:10px;object-fit:cover;background:#fff}.brand b{font-size:18px}.nav button{display:block;width:100%;border:0;background:transparent;color:#cbd5e1;text-align:left;padding:12px 13px;border-radius:9px;margin:3px 0;cursor:pointer;font-size:14px}.nav button:hover,.nav button.active{background:#243041;color:#fff}.main{margin-left:245px;width:calc(100% - 245px);padding:28px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.top h1{margin:0;font-size:25px}.btn{border:0;border-radius:8px;padding:10px 15px;cursor:pointer;font-weight:700;background:#111827;color:#fff}.btn.secondary{background:#e5e7eb;color:#111827}.btn.danger{background:#b91c1c}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:13px;padding:18px}.card small{color:#64748b}.card strong{display:block;font-size:26px;margin-top:7px}.panel{background:#fff;border:1px solid #e5e7eb;border-radius:13px;padding:20px;margin-bottom:18px}.panel h2{margin:0 0 16px;font-size:18px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:11px 9px;border-bottom:1px solid #edf0f3;text-align:left;font-size:13px}.table th{color:#64748b}.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#e2e8f0;font-size:12px}.pill.ok{background:#dcfce7;color:#166534}.pill.warn{background:#fef3c7;color:#92400e}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:700;color:#475569}.field input,.field select,.field textarea{padding:10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;background:#fff}.field textarea{min-height:80px;resize:vertical}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}.modalbox{background:#fff;border-radius:14px;width:min(760px,100%);max-height:90vh;overflow:auto;padding:22px}.hidden{display:none!important}.vehicle-box{border:1px solid #dbe2ea;border-radius:10px;padding:14px;margin-top:10px}.vehicle-head{display:flex;justify-content:space-between;align-items:center}.vehicle-grid{display:grid;grid-template-columns:1fr 160px;gap:12px;margin-top:10px}.choice{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.choice label{border:1px solid #cbd5e1;border-radius:9px;padding:11px;cursor:pointer;text-align:center;font-size:13px}.choice input{margin-right:5px}.totalbox{margin-top:12px;padding:12px;background:#f1f5f9;border-radius:9px;font-weight:700}.seatmap{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.seat{padding:10px;border-radius:7px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;text-align:center;font-size:12px}.seat.occupied{background:#fecaca;color:#991b1b;cursor:not-allowed}.seat.selected{background:#bfdbfe;border-color:#2563eb}.seat.available:hover{background:#eef6ff;border-color:#2563eb}.seatmap-wrap{display:grid;gap:16px}.vehicle-seat-panel{border:1px solid #dbe2ea;border-radius:12px;padding:14px}.vehicle-seat-panel h3{margin:0 0 10px}.vehicle-seat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.seat small{display:block;font-size:10px;margin-top:2px}.seat.taken{background:#fecaca;color:#991b1b;border-color:#fca5a5}.seat.available{background:#f8fafc}.seatmap-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#64748b}.legend-dot{display:inline-flex;align-items:center;gap:5px}.legend-dot i{width:13px;height:13px;border-radius:4px;border:1px solid #cbd5e1;display:inline-block}.legend-free{background:#f8fafc}.legend-taken{background:#fecaca;border-color:#fca5a5}.legend-assigned{background:#bfdbfe;border-color:#2563eb}.empty{padding:30px;text-align:center;color:#64748b}
+@media(max-width:900px){.side{width:205px}.main{margin-left:205px;width:calc(100% - 205px)}.cards{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.side{position:static;width:100%;height:auto}.app{display:block}.main{margin:0;width:100%;padding:16px}.formgrid,.vehicle-grid{grid-template-columns:1fr}.choice{grid-template-columns:repeat(2,1fr)}}
 
+.muted{color:#667085;font-size:13px;margin:4px 0}.section-heading h2,.section-heading h3{margin:0}.section-heading p{margin:5px 0}.modalbox .cards{margin:12px 0}.modalbox .card{padding:14px}.modalbox .card strong{font-size:20px}
+
+.report-summary-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:18px 0 4px;padding:12px;border:1px solid var(--border);border-radius:14px;background:#f8fafc}
+.report-summary-strip div{display:flex;flex-direction:column;gap:3px;padding:8px 10px;border-right:1px solid var(--border)}
+.report-summary-strip div:last-child{border-right:0}
+.report-summary-strip span{font-size:12px;color:var(--muted)}
+.report-summary-strip b{font-size:18px;color:var(--text)}
+.report-tables h3{margin:20px 0 10px}
+@media(max-width:900px){.report-summary-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.report-summary-strip div{border-right:0;border-bottom:1px solid var(--border)}.report-summary-strip div:last-child{border-bottom:0}}
+</style>
+<style>
+.excursion-image-field{grid-column:1/-1}.excursion-image-preview{display:flex;gap:16px;align-items:center;padding:14px;border:1px dashed #cbd5e1;border-radius:14px;background:#f8fafc}.excursion-image-preview img{width:150px;height:95px;object-fit:cover;border-radius:10px;border:1px solid #e2e8f0}.public-trip-card{overflow:hidden;padding:0!important;display:flex;flex-direction:column}.public-trip-cover{width:100%;height:180px;object-fit:cover;display:block;background:#eef4f8}.public-trip-card .public-trip-body{padding:18px}.public-trip-card .public-trip-meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.public-trip-card .public-trip-meta span{background:#eef5fa;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;color:#31506b}.public-trip-empty-cover{height:180px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#eaf4fa,#f8fafc);font-size:44px}.public-preview-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}.public-preview-head .muted{margin:4px 0 0}.trip-detail-image{width:100%;max-height:480px;object-fit:contain;border-radius:16px;background:#f3f6f9;border:1px solid #e5e7eb;display:block;margin-bottom:18px}.
+</style>
+
+<style id="cltur-admin-modern">
+:root{--blue:#0b5cff;--blue2:#2f7cff;--navy:#071a38;--bg:#f4f7fb;--text:#172033;--muted:#667085;--border:#e5eaf2;--green:#16a34a;--red:#dc2626}
+body{background:var(--bg)!important;color:var(--text)!important;font-family:Inter,Arial,sans-serif!important}
+.side{width:245px!important;background:linear-gradient(180deg,#081a35 0%,#0d2c59 100%)!important;padding:18px 12px!important;box-shadow:8px 0 28px rgba(15,23,42,.10)!important;z-index:20}
+.brand{padding:10px 10px 20px!important;margin-bottom:14px!important;border-bottom:1px solid rgba(255,255,255,.12)!important}
+.brand img{width:52px!important;height:52px!important;border-radius:14px!important;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.brand b{font-size:19px!important;letter-spacing:.2px}.brand small{color:#b9c7dc!important}
+.nav button{color:#cbd5e1!important;border-radius:12px!important;padding:12px 13px!important;margin:4px 0!important;font-size:14px!important;transition:.2s!important}
+.nav button:hover{background:rgba(255,255,255,.08)!important;color:#fff!important;transform:translateX(2px)}
+.nav button.active{background:linear-gradient(90deg,#0b5cff,#2878ff)!important;color:#fff!important;box-shadow:0 8px 20px rgba(11,92,255,.22)!important}
+.main{margin-left:245px!important;width:calc(100% - 245px)!important;padding:28px!important;background:var(--bg)!important}
+.top{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:20px!important;margin-bottom:22px!important;padding:22px 24px!important;background:#fff!important;border:1px solid var(--border)!important;border-radius:20px!important;box-shadow:0 8px 28px rgba(15,23,42,.055)!important}
+.top h1{margin:2px 0 0!important;font-size:27px!important;letter-spacing:-.5px!important;color:var(--text)!important}
+.admin-eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--blue);text-transform:uppercase}
+.admin-subtitle{margin:6px 0 0;color:var(--muted);font-size:13px}
+.top.dashboard-head{background:linear-gradient(135deg,#071a38 0%,#0b5cff 72%,#3a8bff 100%)!important;border:0!important;color:#fff!important;position:relative;overflow:hidden;box-shadow:0 18px 42px rgba(11,92,255,.20)!important}
+.top.dashboard-head:after{content:"";position:absolute;width:230px;height:230px;right:-80px;top:-120px;border-radius:50%;background:rgba(255,255,255,.11)}
+.top.dashboard-head h1,.top.dashboard-head .admin-subtitle,.top.dashboard-head .admin-eyebrow{color:#fff!important;position:relative;z-index:1}
+.cards{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important}
+.card{border:1px solid var(--border)!important;border-radius:18px!important;padding:20px!important;box-shadow:0 8px 26px rgba(15,23,42,.055)!important;transition:.2s!important}
+.card:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(15,23,42,.09)!important}
+.card small{color:var(--muted)!important;font-weight:600}.card strong{color:var(--text)!important}
+.panel{border:1px solid var(--border)!important;border-radius:18px!important;padding:21px!important;box-shadow:0 8px 26px rgba(15,23,42,.05)!important}
+.panel h2{font-size:18px!important;color:var(--text)!important}
+.table{border-collapse:separate!important;border-spacing:0!important;overflow:hidden;border-radius:12px!important}.table th{background:#f7f9fc!important;color:#667085!important;font-weight:700!important}.table td,.table th{border-bottom:1px solid #edf1f6!important}
+.btn{border-radius:11px!important;padding:10px 14px!important;background:linear-gradient(135deg,var(--blue),var(--blue2))!important;box-shadow:0 7px 16px rgba(11,92,255,.17)!important}.btn.secondary{background:#eef2f7!important;color:#263247!important;box-shadow:none!important}.btn.danger{background:#dc2626!important}
+input,select,textarea{border:1px solid #dfe5ef!important;border-radius:11px!important;background:#fff!important;min-height:42px!important;padding:10px 12px!important}input:focus,select:focus,textarea:focus{outline:0!important;border-color:#78a5ff!important;box-shadow:0 0 0 4px rgba(11,92,255,.10)!important}
+.pill{border-radius:999px!important;padding:5px 10px!important;font-weight:700!important}
+.empty{padding:34px!important;color:var(--muted)!important;text-align:center}
+@media(max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:640px){.side{width:76px!important;padding:14px 8px!important}.brand div{display:none}.brand{justify-content:center}.brand img{width:48px!important;height:48px!important}.nav button{font-size:0;text-align:center;padding:12px 8px!important}.nav button:first-letter{font-size:18px}.main{margin-left:76px!important;width:calc(100% - 76px)!important;padding:16px!important}.top{padding:18px!important}.cards{grid-template-columns:1fr!important}.top h1{font-size:22px!important}}
+</style>
+
+
+<style id="cltur-freight-modern">
+.freight-flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:12px 0}
+.freight-flow>div{display:flex;align-items:center;gap:8px;background:#f7f9fc;border:1px solid #e5eaf2;border-radius:12px;padding:9px 12px}
+.freight-flow b{display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#0b5cff;color:#fff;font-size:12px}
+.freight-flow span{font-size:12px;font-weight:700;color:#334155}.freight-flow i{color:#94a3b8;font-style:normal;font-weight:900}
+@media(max-width:650px){.freight-flow{justify-content:flex-start}.freight-flow i{display:none}.modalbox .cards{grid-template-columns:1fr!important}}
+</style>
+
+
+<style id="cltur-final-polish">
+:root{
+ --blue:#0b5cff;--blue2:#2f7cff;--navy:#071a38;--bg:#f4f7fb;
+ --text:#172033;--muted:#667085;--line:#e5eaf2;--green:#16a34a;
+ --yellow:#f59e0b;--red:#dc2626;--white:#fff
+}
+body{background:var(--bg)!important;color:var(--text)!important}
+.side{
+ background:linear-gradient(180deg,#071a38 0%,#0b2d5c 100%)!important;
+ box-shadow:8px 0 28px rgba(15,23,42,.08)!important
+}
+.brand{border-bottom:1px solid rgba(255,255,255,.12)!important}
+.brand img{box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.nav button{border-radius:12px!important;transition:.18s!important}
+.nav button:hover{background:rgba(255,255,255,.09)!important}
+.nav button.active{
+ background:linear-gradient(90deg,#0b5cff,#2878ff)!important;
+ box-shadow:0 8px 20px rgba(11,92,255,.20)!important
+}
+.main{padding:30px!important}
+.top{
+ background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:20px;
+ padding:20px 22px;margin-bottom:20px;box-shadow:0 7px 24px rgba(15,23,42,.045)
+}
+.top h1{font-size:27px!important;font-weight:800!important;letter-spacing:-.03em}
+.admin-eyebrow{color:var(--blue)!important;font-weight:800!important;letter-spacing:.04em}
+.admin-subtitle{color:var(--muted)!important}
+.cards{gap:16px!important}
+.card,.panel{
+ border:1px solid var(--line)!important;border-radius:18px!important;
+ box-shadow:0 8px 28px rgba(15,23,42,.055)!important
+}
+.card{padding:19px!important;transition:.18s}
+.card:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(15,23,42,.08)!important}
+.card small{color:var(--muted)!important;font-weight:600}
+.card strong{color:var(--text)!important}
+.panel{padding:21px!important}
+.panel h2{font-weight:800!important;letter-spacing:-.015em}
+.btn{
+ border-radius:11px!important;background:linear-gradient(135deg,var(--blue),var(--blue2))!important;
+ box-shadow:0 7px 16px rgba(11,92,255,.16)!important
+}
+.btn.secondary{background:#eef2f7!important;color:#344054!important;box-shadow:none!important}
+.btn.danger{background:#dc2626!important;color:#fff!important;box-shadow:none!important}
+.table{border-collapse:separate!important;border-spacing:0!important;overflow:hidden}
+.table th{background:#f8fafc!important;color:#667085!important;font-weight:800!important}
+.table th,.table td{border-bottom:1px solid #edf1f5!important}
+.table tr:last-child td{border-bottom:0!important}
+.pill{font-weight:800!important}
+.field input,.field select,.field textarea{
+ border:1px solid #d9e0ea!important;border-radius:11px!important;min-height:42px!important
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+ outline:none!important;border-color:#6d9eff!important;
+ box-shadow:0 0 0 4px rgba(11,92,255,.09)!important
+}
+.modalbox{border-radius:20px!important;box-shadow:0 24px 70px rgba(15,23,42,.22)!important}
+.vehicle-box,.vehicle-seat-panel{
+ border:1px solid var(--line)!important;border-radius:14px!important;background:#fbfcfe
+}
+.notice{border-radius:12px!important}
+.final-hero{
+ background:linear-gradient(135deg,#071a38 0%,#0b5cff 68%,#3a8bff 100%);
+ color:#fff;border-radius:22px;padding:25px 26px;margin-bottom:18px;
+ box-shadow:0 18px 45px rgba(11,92,255,.19);position:relative;overflow:hidden
+}
+.final-hero:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;
+ right:-85px;top:-110px;background:rgba(255,255,255,.10)}
+.final-hero>*{position:relative;z-index:1}
+.final-hero h2{margin:0;color:#fff!important;font-size:22px}
+.final-hero p{margin:7px 0 0;color:rgba(255,255,255,.86)}
+.kpi-label{font-size:12px;color:var(--muted);font-weight:700}
+.kpi-icon{font-size:21px;margin-bottom:8px}
+@media(max-width:900px){.main{padding:20px!important}}
+@media(max-width:650px){
+ .main{padding:14px!important}
+ .top{padding:17px;border-radius:16px}
+ .cards{grid-template-columns:1fr!important}
+ .table{min-width:720px}
+ .panel{overflow:auto}
+ .final-hero{padding:20px}
+}
+</style>
+
+
+<style id="cltur-v2">
+.calendar-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;flex-wrap:wrap}.calendar-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.calendar-controls select,.calendar-controls input{min-height:40px;border:1px solid #d9e0ea;border-radius:10px;background:#fff;padding:0 10px}.calendar-legend{display:flex;gap:20px;flex-wrap:wrap;padding:14px 0 18px;border-bottom:1px solid #edf1f5;margin-bottom:12px}.calendar-legend span{font-size:12px;font-weight:700;color:#475467;display:flex;align-items:center;gap:7px}.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}.legend-dot.free{background:#fff;border:1px solid #cbd5e1}.legend-dot.blue{background:#0b5cff}.legend-dot.red{background:#dc2626}.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}.calendar-weekdays div{text-align:center;font-size:12px;font-weight:800;color:#667085;padding:7px}.cal-day{min-height:112px;border:1px solid #e5eaf2;border-radius:12px;background:#fff;padding:8px;position:relative;overflow:hidden}.cal-day.has-blue{border-top:4px solid #0b5cff}.cal-day.has-red{border-top:4px solid #dc2626}.cal-day.muted-day{background:#f8fafc;color:#a0a9b8}.cal-day.today{box-shadow:0 0 0 2px #7ea8ff inset}.cal-num{font-weight:800;font-size:13px;margin-bottom:6px}.cal-event{display:block;width:100%;text-align:left;border:0;border-radius:7px;padding:5px 6px;margin:4px 0;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cal-event.blue{background:#eaf1ff;color:#0b5cff}.cal-event.red{background:#feecec;color:#c51f1f}.cal-more{font-size:10px;color:#667085;margin-top:4px;font-weight:700}.top-actions{display:flex;gap:8px;align-items:center}.icon-btn{position:relative;border:1px solid #e2e8f0;background:#fff;border-radius:11px;padding:9px 12px;cursor:pointer}.icon-btn span{position:absolute;top:-7px;right:-7px;background:#dc2626;color:#fff;border-radius:99px;min-width:17px;height:17px;display:grid;place-items:center;font-size:10px;font-weight:800}.notification-list{display:grid;gap:9px;margin-top:15px}.notification-item{display:flex;gap:12px;align-items:flex-start;padding:13px;border:1px solid #e5eaf2;border-radius:12px;background:#fff;cursor:pointer;position:relative}.notification-item.read{opacity:.6}.notification-icon{font-size:22px}.notification-item p{margin:3px 0;color:#667085;font-size:13px}.new-dot{width:8px;height:8px;border-radius:50%;background:#0b5cff;position:absolute;right:12px;top:14px}@media(max-width:700px){.calendar-grid,.calendar-weekdays{min-width:720px}.calendar-panel{overflow:auto}.top-actions{margin-top:8px}}
+</style>
+
+<style id="cltur-v3-notify-quote">
+.notification-button{position:relative!important}.notification-dot{display:none;position:absolute;right:7px;top:6px;width:9px;height:9px;border-radius:50%;background:#f59e0b;border:2px solid #fff}.notification-dot.show{display:block}
+.notification-button #notificationCount{position:absolute;right:-6px;top:-7px;background:#dc2626;color:#fff;border-radius:99px;min-width:17px;height:17px;display:grid;place-items:center;font-size:9px;font-weight:800}
+.notification-head{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}.quote-head{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;flex-wrap:wrap}.quote-request{margin-top:15px;border:1px solid #e5eaf2;border-radius:15px;background:#fbfcfe;overflow:hidden}.quote-row{display:flex;justify-content:space-between;gap:20px;padding:12px 14px;border-bottom:1px solid #edf1f5}.quote-row span{color:#667085;font-size:13px}.quote-row b{text-align:right}.quote-notes{padding:13px 14px}.quote-notes span{font-weight:800;color:#475467}.quote-notes p{margin:6px 0 0;color:#667085;white-space:pre-wrap}.quote-answer{margin-top:17px;padding:17px;border-radius:15px;background:#f5f8ff;border:1px solid #dbe6ff}.quote-preview{margin-top:12px;background:#fff;border:1px dashed #cbd5e1;border-radius:11px;padding:11px}.quote-preview textarea{display:block;width:100%;min-height:180px;resize:vertical;margin-top:8px;border:0!important;border-radius:8px!important;padding:10px!important;background:#fff!important;box-shadow:none!important;font:inherit!important;font-size:13px!important;line-height:1.55!important;color:#334155!important;white-space:pre-wrap!important}.quote-preview textarea:focus{outline:none!important;border:1px solid #78a5ff!important;box-shadow:0 0 0 3px rgba(11,92,255,.08)!important}.quote-preview pre{white-space:pre-wrap;font-family:inherit;font-size:12px;line-height:1.5;color:#475467;margin:7px 0 0}.quote-unavailable{margin-top:10px;padding:12px 14px;border:1px solid #f4d7d7;background:#fff7f7;border-radius:11px;color:#7a271a}.quote-unavailable b{display:block;margin-bottom:4px}.quote-unavailable p{margin:0;color:#667085;font-size:13px}
+</style>
+
+<style id="cltur-v4">
+.dashboard-bell{position:relative;display:flex;align-items:center;gap:8px;background:#fff;color:#0b5cff;border:0;border-radius:12px;padding:11px 14px;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,.12);cursor:pointer;white-space:nowrap}.dashboard-bell .notification-dot{display:none;position:absolute;left:28px;top:6px}.dashboard-bell .notification-dot.show{display:block}.quote-answer select{width:100%}
+</style>
+
+<style id="cltur-v5-notification-fix">
+.notification-button{position:relative!important;overflow:visible!important}
+.notification-button .notification-dot,
+.dashboard-bell .notification-dot{
+  width:11px!important;height:11px!important;background:#f59e0b!important;
+  border:2px solid #fff!important;border-radius:50%!important;
+  box-shadow:0 0 0 2px rgba(245,158,11,.22),0 2px 7px rgba(245,158,11,.45)!important;
+}
+.notification-button .notification-dot{right:5px!important;top:4px!important}
+.dashboard-bell .notification-dot{left:27px!important;top:5px!important}
+</style>
+
+<style id="cltur-v13-times">
+.field input[type="time"]{font-variant-numeric:tabular-nums}
+.quote-row b{font-variant-numeric:tabular-nums}
+</style>
+
+<style id="cltur-v14-management">
+.action-buttons{display:flex;align-items:center;gap:7px;flex-wrap:nowrap;white-space:nowrap}.action-buttons .btn{margin:0}.trip-card-grid,.finance-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}.trip-card,.finance-card{border:1px solid #e2e8f0;background:#fff;border-radius:16px;padding:18px;cursor:pointer;transition:.18s;box-shadow:0 4px 12px rgba(15,23,42,.04)}.trip-card:hover,.finance-card:hover{transform:translateY(-2px);border-color:#b9cdfb;box-shadow:0 10px 22px rgba(15,92,255,.09)}.trip-card h3,.finance-card h3{margin:0 0 5px;color:#0f3d5e}.trip-card .meta,.finance-card .meta{font-size:12px;color:#667085}.trip-card .stats,.finance-card .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.trip-card .stat,.finance-card .stat{background:#f7f9fc;border-radius:10px;padding:9px}.trip-card .stat small,.finance-card .stat small{display:block;color:#667085;font-size:10px;font-weight:700}.trip-card .stat b,.finance-card .stat b{display:block;margin-top:3px;font-size:13px}.result-positive{color:#16803c!important}.result-negative{color:#c62828!important}.operation-tabs{display:flex;gap:8px;flex-wrap:wrap}.operation-tab{border:1px solid #dbe3ee;background:#fff;border-radius:11px;padding:9px 13px;font-weight:800;color:#475467;cursor:pointer}.operation-tab.active{background:#0b5cff;color:#fff;border-color:#0b5cff}.notification-alert{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 17px;border-radius:15px;background:#fff7e6;border:1px solid #f7c873;box-shadow:0 7px 18px rgba(245,158,11,.09);margin-bottom:15px}.notification-alert .left{display:flex;align-items:flex-start;gap:11px}.notification-alert .bell{font-size:22px}.notification-alert h3{margin:0;font-size:15px;color:#7a4b00}.notification-alert p{margin:4px 0 0;color:#8a6a32;font-size:12px}.notification-alert .btn{background:#f59e0b;color:#fff;border-color:#f59e0b}.passenger-detail-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.passenger-detail-head .summary{display:flex;gap:9px;flex-wrap:wrap}.mini-pill{display:inline-flex;align-items:center;gap:5px;background:#f5f7fa;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:800;color:#475467}.finance-card .result{margin-top:14px;padding-top:12px;border-top:1px solid #edf1f5;display:flex;justify-content:space-between;align-items:center}.finance-card .result b{font-size:16px}.finance-result-badge{display:inline-flex;align-items:center;justify-content:center;min-width:92px;min-height:34px;padding:6px 12px!important;border-radius:999px!important;text-align:center;line-height:1.1;white-space:nowrap}.pill.danger{background:#fee2e2;color:#b91c1c}.currency-field{display:flex;align-items:center;border:1px solid #cbd5e1;border-radius:8px;background:#fff;overflow:hidden}.currency-field span{padding-left:11px;font-weight:800;color:#475569}.currency-field input{border:0!important;outline:0;width:100%;padding-left:7px!important}.finance-section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}@media(max-width:650px){.expense-form-grid{grid-template-columns:1fr!important}.action-buttons{flex-wrap:wrap}.trip-card .stats,.finance-card .stats{grid-template-columns:1fr}.notification-alert{align-items:flex-start;flex-direction:column}}
+</style>
+<style id="cltur-quote-preview-fix">.quote-preview textarea{display:block!important;width:100%!important;min-height:180px!important;resize:vertical!important;margin-top:8px!important;box-sizing:border-box!important}.quote-preview b{display:block}.quote-preview textarea[readonly]{background:#f8fafc!important;color:#475467!important}</style>
+</head><body>
+<div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
+<div id="modal" class="modal hidden"></div>
+<script>
+// Referências explícitas ao DOM para garantir que o Dashboard seja renderizado no carregamento/recarregamento.
+const main=document.getElementById('main');
+const modal=document.getElementById('modal');
+const KEY='cltur_data_v1';
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||{};
+// Normaliza os dados de versões anteriores para que nenhuma seção do Dashboard
+// quebre quando alguma coleção ainda não existir no localStorage.
+if(!Array.isArray(data.trips)) data.trips=[];
+if(!Array.isArray(data.people)) data.people=[];
+if(!Array.isArray(data.charters)) data.charters=[];
+if(!Array.isArray(data.expenses)) data.expenses=[];
+if(!Array.isArray(data.payments)) data.payments=[];
+function passengerPayments(pid){return data.payments.filter(x=>x.personId==pid).sort((a,b)=>(b.date||'').localeCompare(a.date||''))}
+function paymentTotal(p){let arr=passengerPayments(p.id);return arr.length?arr.reduce((a,x)=>a+Number(x.amount||0),0):Number(p.paid||0)}
+function paymentStatus(p){let paid=paymentTotal(p), value=Number(p.value||0);if(value>0&&paid>=value)return 'Confirmado';if(paid>0)return 'Parcial';return p.status==='Cancelado'?'Cancelado':'Pendente'}
+function paymentMethodLabel(m){return m==='Pix'?'📲 Pix':m==='Cartão'?'💳 Cartão':m==='Dinheiro'?'💵 Dinheiro':'🏦 Transferência'}
+
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function fmt(d){if(!d)return '-';let [y,m,day]=d.split('-');return `${day}/${m}/${y}`}
+function tripName(id){return data.trips.find(t=>t.id==id)?.destination||'—'}
+function totalSeats(t){return (t.vehicles||[]).reduce((a,v)=>a+Number(v.seats||0),0)}
+function occupied(tid){return data.people.filter(p=>p.tripId==tid&&p.seat).length}
+function seatTaken(tid,vehicleIndex,seat,ignoreId=''){return data.people.some(p=>p.tripId==tid&&p.id!=ignoreId&&Number(p.vehicleIndex||0)===Number(vehicleIndex)&&String(p.seat||'')===String(seat))}
+function vehicleLabel(v,i){return `${v.type||'Veículo'} ${i+1}`}
+function assignedPassenger(tid,vehicleIndex,seat){return data.people.find(p=>p.tripId==tid&&Number(p.vehicleIndex||0)===Number(vehicleIndex)&&String(p.seat||'')===String(seat))}
+function openModal(html){modal.innerHTML='<div class="modalbox">'+html+'</div>';modal.classList.remove('hidden')}
+function closeModal(){modal.classList.add('hidden');modal.innerHTML=''}
+modal.addEventListener('click',e=>{if(e.target===modal)closeModal()})
+function layout(title,body,action=''){let dash=title==='Dashboard';return `<div class="top ${dash?'dashboard-head':''}"><div><div class="admin-eyebrow">CL TUR • Painel administrativo</div><h1>${title}</h1><p class="admin-subtitle">${dash?'Gerencie excursões, passageiros, fretamentos e financeiro em um só lugar.':'Controle e organize as operações da CL TUR.'}</p></div>${action}</div>${body}`}
+function render(page='dashboard'){
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+ if(page==='dashboard')dashboard(); if(page==='trips')trips(); if(page==='people')people(); if(page==='charters')charters(); if(page==='finance')finance(); if(page==='calendar')calendar(); if(page==='reports')reports(); if(page==='public')publicPage();
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>render(b.dataset.page));
+if(Array.isArray(data.charters)){let changed=false;data.charters.forEach(c=>{if(['Orçamento solicitado','Orçamento'].includes(c.status) && !Number(c.value||0)){c.status='Aguardando fechamento';changed=true}});if(changed)localStorage.setItem(KEY,JSON.stringify(data))}
+function dashboard(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const upcoming=data.trips.filter(t=>new Date((t.departure||'9999-12-31')+'T00:00')>=today)
+    .sort((a,b)=>(a.departure||'').localeCompare(b.departure||''));
+  const confirmed=data.people.filter(p=>paymentStatus(p)==='Confirmado').length;
+  const peopleRevenue=data.people.reduce((a,p)=>a+Number(p.value||0),0);
+  const peopleReceived=data.people.reduce((a,p)=>a+paymentTotal(p),0);
+  const charterRevenue=data.charters.reduce((a,c)=>a+charterFinancialContract(c),0);
+  const charterReceived=data.charters.reduce((a,c)=>a+charterFinancialReceived(c),0);
+  const expenses=data.expenses.reduce((a,e)=>a+Number(e.value||0),0);
+  const plannedCosts=data.trips.reduce((a,t)=>a+Number(t.costs||0),0);
+  const totalRevenue=peopleRevenue+charterRevenue;
+  const totalReceived=peopleReceived+charterReceived;
+  const pending=Math.max(0,totalRevenue-totalReceived);
+  const currentResult=totalReceived-expenses;
+  const projected=totalRevenue-plannedCosts-expenses;
+  const openCharters=data.charters.filter(c=>!['Concluído','Cancelado'].includes(c.status)).length;
+  const pendingPeople=data.people.filter(p=>paymentStatus(p)==='Parcial'||paymentStatus(p)==='Pendente').length;
+
+  const nextRows=upcoming.slice(0,6).map(t=>{
+    const total=totalSeats(t), occ=occupied(t.id), free=Math.max(0,total-occ);
+    const pct=total?Math.round((occ/total)*100):0;
+    return `<tr>
+      <td><b>${esc(t.destination)}</b><br><small>${esc(t.origin||'')}</small></td>
+      <td>${fmt(t.departure)}${t.time?' · '+esc(t.time):''}</td>
+      <td>${(t.vehicles||[]).map(v=>esc(v.type)+' ('+v.seats+')').join(' + ')}</td>
+      <td><b>${free}</b> / ${total}<br><small>${pct}% ocupados</small></td>
+      <td><div class="action-buttons"><button class="btn secondary" onclick="tripFinance('${t.id}')">💰 Financeiro</button><button class="btn secondary" onclick="seatMap('${t.id}')">💺 Assentos</button></div></td>
+    </tr>`;
+  }).join('');
+
+  const tripReport=data.trips.slice().sort((a,b)=>(a.departure||'').localeCompare(b.departure||'')).map(t=>{
+    const ps=data.people.filter(p=>p.tripId==t.id);
+    const contracted=ps.reduce((a,p)=>a+Number(p.value||0),0);
+    const received=ps.reduce((a,p)=>a+paymentTotal(p),0);
+    const costs=data.expenses.filter(e=>e.tripId==t.id&&!e.charterId).reduce((a,e)=>a+Number(e.value||0),0);
+    const result=received-costs;
+    const pendingTrip=Math.max(0,contracted-received);
+    return `<tr><td><b>🚌 ${esc(t.destination)}</b><br><small>${fmt(t.departure)}</small></td><td>${money(contracted)}</td><td>${money(received)}</td><td>${money(pendingTrip)}</td><td>${money(costs)}</td><td class="${result>=0?'result-positive':'result-negative'}"><b>${money(result)}</b></td></tr>`;
+  }).join('');
+
+  const charterReport=data.charters.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(c=>{
+    const contracted=charterFinancialContract(c);
+    const received=charterFinancialReceived(c);
+    const costs=data.expenses.filter(e=>e.charterId==c.id).reduce((a,e)=>a+Number(e.value||0),0);
+    const pendingCharter=Math.max(0,contracted-received);
+    const result=charterIsFinancial(c)?received-costs:0;
+    const statusLabel=c.status||'Aguardando fechamento';
+    return `<tr><td><b>🚐 ${esc(c.client||'Fretamento')}</b><br><small>${fmt(c.date)} · ${esc(c.destination||'')} · ${esc(statusLabel)}</small></td><td>${money(contracted)}</td><td>${money(received)}</td><td>${money(pendingCharter)}</td><td>${money(costs)}</td><td class="${result>=0?'result-positive':'result-negative'}"><b>${charterIsFinancial(c)?money(result):'—'}</b></td></tr>`;
+  }).join('');
+
+  main.innerHTML=layout('Dashboard',`
+    <div class="final-hero" style="display:flex;justify-content:space-between;align-items:center;gap:18px"><div>
+      <h2>Visão geral da CL TUR</h2>
+      <p>Acompanhe as operações, o financeiro e o que precisa de atenção em um único painel.</p></div><button id="dashboardNotificationBell" class="dashboard-bell" onclick="openNotifications()" title="Notificações">🔔<i id="dashboardNotificationDot" class="notification-dot"></i><span>Notificações</span></button>
+    </div>
+    <div id="dashboardNotificationAlert"></div>
+
+    <div class="cards">
+      <div class="card"><div class="kpi-icon">🚌</div><div class="kpi-label">Próximas excursões</div><strong>${upcoming.length}</strong></div>
+      <div class="card"><div class="kpi-icon">👥</div><div class="kpi-label">Passageiros confirmados</div><strong>${confirmed}</strong></div>
+      <div class="card"><div class="kpi-icon">💰</div><div class="kpi-label">Total a receber</div><strong>${money(pending)}</strong></div>
+      <div class="card"><div class="kpi-icon">📈</div><div class="kpi-label">Resultado atual</div><strong class="${currentResult>=0?'result-positive':'result-negative'}">${money(currentResult)}</strong></div>
+    </div>
+
+    <div class="panel">
+      <div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div><h2>📊 Relatório geral</h2><p class="muted">Resumo financeiro consolidado de excursões e fretamentos.</p></div>
+        <button class="btn secondary" onclick="render('finance')">Abrir financeiro completo</button>
+      </div>
+      <div class="cards">
+        <div class="card"><small>Receita contratada</small><strong>${money(totalRevenue)}</strong><p class="muted">Excursões + fretamentos</p></div>
+        <div class="card"><small>Total recebido</small><strong>${money(totalReceived)}</strong><p class="muted">Valores já registrados</p></div>
+        <div class="card"><small>Total a receber</small><strong>${money(pending)}</strong><p class="muted">Saldos em aberto</p></div>
+        <div class="card"><small>Custos realizados</small><strong>${money(expenses)}</strong><p class="muted">Despesas lançadas</p></div>
+        <div class="card"><small>Resultado atual</small><strong class="${currentResult>=0?'result-positive':'result-negative'}">${money(currentResult)}</strong><p class="muted">Recebido − custos</p></div>
+        <div class="card"><small>Resultado projetado</small><strong class="${projected>=0?'result-positive':'result-negative'}">${money(projected)}</strong><p class="muted">Considerando receitas e custos previstos</p></div>
+      </div>
+      <div class="report-summary-strip">
+        <div><span>Excursões</span><b>${data.trips.length}</b></div>
+        <div><span>Fretamentos</span><b>${data.charters.length}</b></div>
+        <div><span>Publicadas</span><b>${data.trips.filter(t=>t.published).length}</b></div>
+        <div><span>Fretamentos em aberto</span><b>${openCharters}</b></div>
+        <div><span>Pagamentos pendentes</span><b>${pendingPeople}</b></div>
+      </div>
+      ${tripReport||charterReport?`<div class="report-tables">
+        ${tripReport?`<div><h3>Resultado por excursão</h3><div style="overflow:auto"><table class="table"><tr><th>Operação</th><th>Contratado</th><th>Recebido</th><th>A receber</th><th>Custos</th><th>Resultado</th></tr>${tripReport}</table></div></div>`:''}
+        ${charterReport?`<div style="margin-top:22px"><h3>Resultado por fretamento</h3><div style="overflow:auto"><table class="table"><tr><th>Operação</th><th>Contratado</th><th>Recebido</th><th>A receber</th><th>Custos</th><th>Resultado</th></tr>${charterReport}</table></div></div>`:''}
+      </div>`:'<div class="empty">Ainda não há operações financeiras cadastradas.</div>'}
+    </div>
+
+    <div class="panel">
+      <div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div><h2>Próximas excursões</h2><p class="muted">Acompanhe ocupação, veículos e ações rápidas.</p></div>
+        <button class="btn" onclick="tripForm()">+ Nova excursão</button>
+      </div>
+      ${nextRows?`<div style="overflow:auto"><table class="table"><tr><th>Destino</th><th>Saída</th><th>Veículos</th><th>Vagas</th><th></th></tr>${nextRows}</table></div>`:'<div class="empty">Nenhuma excursão futura cadastrada.</div>'}
+    </div>
+
+    <div class="cards">
+      <div class="panel"><h2>🚐 Fretamentos</h2><p class="muted">Solicitações que ainda precisam de acompanhamento.</p><h3 style="font-size:28px;margin:10px 0">${openCharters}</h3><button class="btn secondary" onclick="render('charters')">Abrir fretamentos</button></div>
+      <div class="panel"><h2>💳 Pagamentos pendentes</h2><p class="muted">Passageiros com saldo em aberto.</p><h3 style="font-size:28px;margin:10px 0">${pendingPeople}</h3><button class="btn secondary" onclick="render('people')">Ver passageiros</button></div>
+    </div>
+  `);
+}
+function trips(){main.innerHTML=layout('Excursões',`<div class="panel"><button class="btn" onclick="tripForm()">+ Nova excursão</button></div><div class="panel"><table class="table"><tr><th>Destino</th><th>Data</th><th>Veículos</th><th>Preço</th><th>Vagas</th><th>Status</th><th></th></tr>${data.trips.map(t=>`<tr><td><b>${esc(t.destination)}</b><br><small>${esc(t.origin)}</small></td><td>${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''}</td><td>${(t.vehicles||[]).map(v=>v.type+' · '+v.seats).join('<br>')}</td><td>${money(t.price)}</td><td>${totalSeats(t)-occupied(t.id)} / ${totalSeats(t)}</td><td><span class="pill ${t.published?'ok':''}">${t.published?'Publicado':'Privado'}</span></td><td><div class="action-buttons"><button class="btn secondary" onclick="tripForm('${t.id}')">Editar</button><button class="btn secondary" onclick="seatMap('${t.id}')">💺 Assentos</button><button class="btn secondary" onclick="tripFinance('${t.id}')">💰 Financeiro</button><button class="btn secondary" onclick="tripRoute('${t.id}')">📲 Roteiro</button><button class="btn danger" onclick="delTrip('${t.id}')">Excluir</button></div></td></tr>`).join('')}</table></div>`)}
+function vehicleOptions(selected){return ['Van','Ônibus'].map(x=>`<option ${selected===x?'selected':''}>${x}</option>`).join('')}
+function tripForm(id){let t=data.trips.find(x=>x.id==id)||{destination:'',origin:'',departure:'',returnDate:'',time:'',price:'',costs:'',notes:'',routeMessage:'',published:true,image:'',vehicles:[{type:'Van',seats:16}],childRuleEnabled:false,childFreeTransportAge:'',childExtraPrice:0};let vehicles=t.vehicles?.length?t.vehicles:[{type:'Van',seats:16}];openModal(`<h2>${id?'Editar':'Nova'} excursão</h2><form onsubmit="saveTrip(event,'${id||''}')"><div class="formgrid"><div class="field"><label>Destino</label><input name="destination" value="${esc(t.destination)}" required></div><div class="field"><label>Origem</label><input name="origin" value="${esc(t.origin)}"></div><div class="field"><label>Data de saída</label><input type="date" name="departure" value="${t.departure}" required></div><div class="field"><label>Data de retorno</label><input type="date" name="returnDate" value="${t.returnDate||''}"></div><div class="field"><label>Horário</label><input type="time" name="time" value="${t.time||''}"></div><div class="field"><label>Preço por pessoa</label><input type="number" step="0.01" name="price" value="${t.price||''}"></div><div class="field"><label>Custos previstos</label><input type="number" step="0.01" name="costs" value="${t.costs||''}"></div><div class="field"><label>Publicar na área do cliente</label><select name="published"><option value="1" ${t.published?'selected':''}>Sim</option><option value="0" ${!t.published?'selected':''}>Não</option></select></div><div class="field full"><label>📝 Descrição completa da excursão</label><textarea name="notes" rows="8" placeholder="Escreva aqui o texto comercial da viagem: roteiro, valores, o que está incluso, formas de pagamento, condições, etc.">${esc(t.notes)}</textarea><small class="muted" style="display:block;margin-top:7px">Esse texto aparece na área do cliente para apresentar a excursão.</small></div><div class="field full"><label>📋 Roteiro e orientações aos passageiros</label><textarea name="routeMessage" rows="12" placeholder="Ex.: pontos de embarque, horários, tolerância, parada para café, documentos, regras e demais orientações da viagem.">${esc(t.routeMessage||'')}</textarea><small class="muted" style="display:block;margin-top:7px">Mensagem específica desta excursão. Depois, use o botão 📲 Roteiro na lista de excursões para enviar aos passageiros cadastrados nesta viagem.</small></div><div class="field full"><label>👶 Regra especial para crianças</label><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:12px;border:1px solid #dbe2ea;border-radius:10px;background:#f8fafc"><label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700"><input type="checkbox" name="childRuleEnabled" ${t.childRuleEnabled?'checked':''}> Esta excursão possui regra especial</label><div class="field"><label>Até quantos anos?</label><input type="number" min="0" max="17" step="1" name="childFreeTransportAge" value="${t.childFreeTransportAge??''}" placeholder="Ex.: 6"></div><div class="field"><label>Valor de hospedagem/outros (R$)</label><input type="number" min="0" step="0.01" name="childExtraPrice" value="${Number(t.childExtraPrice||0)||''}" placeholder="Ex.: 100,00"></div></div><small class="muted" style="display:block;margin-top:7px">Até a idade informada, a criança não paga o transporte e não ocupa poltrona. Se houver hospedagem ou outro custo, informe o valor acima; o sistema calculará automaticamente ao receber a data de nascimento.</small></div><div class="field excursion-image-field"><label>Imagem/arte da excursão</label><div class="excursion-image-preview">${t.image?`<img src="${t.image}" alt="Arte da excursão">`:'<div style="font-size:42px">🖼️</div>'}<div style="flex:1"><input type="file" name="image" accept="image/*"><small class="muted" style="display:block;margin-top:7px">Envie a arte da viagem. Ela aparecerá em destaque quando o cliente abrir a excursão.</small>${t.image?'<label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px"><input type="checkbox" name="removeImage"> Remover imagem atual</label>':''}</div></div></div></div><hr><h3>Veículos da excursão</h3><div class="choice"><label><input type="radio" name="vehicleMode" value="van" onchange="setVehicleMode('van')"> 1 Van</label><label><input type="radio" name="vehicleMode" value="bus" onchange="setVehicleMode('bus')"> 1 Ônibus</label><label><input type="radio" name="vehicleMode" value="mix" onchange="setVehicleMode('mix')"> Van + Ônibus</label><label><input type="radio" name="vehicleMode" value="2bus" onchange="setVehicleMode('2bus')"> 2 Ônibus</label></div><div id="vehicleFields"></div><div class="actions"><button type="button" class="btn secondary" onclick="closeModal()">Cancelar</button><button class="btn">Salvar excursão</button></div></form>`);let mode=vehicles.length===2?(vehicles.filter(v=>v.type==='Ônibus').length===2?'2bus':'mix'):(vehicles[0]?.type==='Ônibus'?'bus':'van');document.querySelector(`input[name=vehicleMode][value=${mode}]`).checked=true;setVehicleMode(mode,vehicles)}
+
+
+async function fileToDataURL(file){return new Promise((resolve,reject)=>{if(!file){resolve('');return}let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)})}
+
+function setVehicleMode(mode,old){let defs={van:[['Van',old?.[0]?.seats||16]],bus:[['Ônibus',old?.[0]?.seats||46]],mix:[['Van',old?.find(v=>v.type==='Van')?.seats||16],['Ônibus',old?.find(v=>v.type==='Ônibus')?.seats||46]],'2bus':[['Ônibus',old?.[0]?.seats||46],['Ônibus',old?.[1]?.seats||46]]};document.getElementById('vehicleFields').innerHTML=defs[mode].map((v,i)=>`<div class="vehicle-box"><div class="vehicle-head"><b>${v[0]} ${defs[mode].length>1?'#'+(i+1):''}</b><span>Capacidade</span></div><div class="vehicle-grid"><select name="vtype${i}">${vehicleOptions(v[0])}</select><input type="number" min="1" name="vseats${i}" value="${v[1]}" oninput="calcVehicleTotal(${defs[mode].length})"></div></div>`).join('')+`<div class="totalbox">Total de lugares: <span id="vehicleTotal">${defs[mode].reduce((a,v)=>a+Number(v[1]),0)}</span></div>`}
+function calcVehicleTotal(n){let s=0;for(let i=0;i<n;i++)s+=Number(document.querySelector(`[name=vseats${i}]`)?.value||0);document.getElementById('vehicleTotal').textContent=s}
+async function saveTrip(e,id){e.preventDefault();let f=new FormData(e.target);let childAgeRaw=f.get('childFreeTransportAge');let childEnabled=f.get('childRuleEnabled')==='on'||(childAgeRaw!==null&&String(childAgeRaw).trim()!=='');if(childEnabled&&String(childAgeRaw||'').trim()===''){alert('Informe a idade limite da regra especial para crianças.');return}let mode=e.target.vehicleMode.value;let n={van:1,bus:1,mix:2,'2bus':2}[mode],vehicles=[];for(let i=0;i<n;i++)vehicles.push({type:f.get('vtype'+i),seats:Number(f.get('vseats'+i))});let old=id?data.trips.find(t=>t.id==id):null;let image=old?.image||'';if(f.get('removeImage'))image='';let file=e.target.querySelector('input[name="image"]')?.files?.[0];if(file)image=await fileToDataURL(file);let obj={id:id||Date.now().toString(),destination:f.get('destination'),origin:f.get('origin'),departure:f.get('departure'),returnDate:f.get('returnDate'),time:f.get('time'),price:Number(f.get('price')||0),costs:Number(f.get('costs')||0),notes:f.get('notes'),routeMessage:f.get('routeMessage')||'',published:f.get('published')==='1',image,vehicles,childRuleEnabled:childEnabled,childFreeTransportAge:childEnabled&&String(childAgeRaw||'').trim()!==''?Number(childAgeRaw):'',childExtraPrice:childEnabled?Number(f.get('childExtraPrice')||0):0};if(id){let i=data.trips.findIndex(t=>t.id==id);data.trips[i]=obj}else data.trips.push(obj);closeModal();save();render('trips')}
+function tripRoute(id){let t=data.trips.find(x=>x.id==id);if(!t)return;let ps=data.people.filter(p=>p.tripId==id);let valid=ps.filter(p=>String(p.phone||'').replace(/\D/g,'').length>=10);openModal(`<h2>📲 Roteiro — ${esc(t.destination)}</h2><p class="muted">${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''}</p><div class="cards" style="grid-template-columns:repeat(3,minmax(0,1fr));margin:14px 0"><div class="card"><small>Passageiros</small><strong>${ps.length}</strong></div><div class="card"><small>Com WhatsApp</small><strong>${valid.length}</strong></div><div class="card"><small>Sem telefone</small><strong>${ps.length-valid.length}</strong></div></div><div class="field"><label>Mensagem que será enviada</label><textarea id="routeMessageEdit" rows="16">${esc(t.routeMessage||'')}</textarea></div><div class="notice" style="margin-top:12px">⚠️ No protótipo, o sistema abre as conversas do WhatsApp com a mensagem pronta. O envio final de cada conversa ainda precisa ser confirmado no WhatsApp. Na versão com integração oficial, isso poderá ser automatizado.</div><div class="actions"><button type="button" class="btn secondary" onclick="closeModal()">Fechar</button><button type="button" class="btn secondary" onclick="saveRouteMessage('${id}')">💾 Salvar roteiro</button><button type="button" class="btn" onclick="sendTripRoute('${id}')">📲 Enviar aos passageiros</button></div>`)}
+function saveRouteMessage(id){let t=data.trips.find(x=>x.id==id);let el=document.getElementById('routeMessageEdit');if(!t||!el)return;t.routeMessage=el.value;save();alert('Roteiro salvo com sucesso.');}
+function sendTripRoute(id){let t=data.trips.find(x=>x.id==id);if(!t)return;let msg=String(document.getElementById('routeMessageEdit')?.value||t.routeMessage||'').trim();let ps=data.people.filter(p=>p.tripId==id),valid=ps.filter(p=>String(p.phone||'').replace(/\D/g,'').length>=10);if(!msg){alert('Digite o roteiro antes de enviar.');return}if(!valid.length){alert('Nenhum passageiro desta excursão possui telefone/WhatsApp cadastrado.');return}t.routeMessage=msg;save();if(!confirm(`Abrir o WhatsApp para ${valid.length} passageiro(s) desta excursão?`))return;valid.forEach((p,i)=>{setTimeout(()=>{let phone=whatsappBR(p.phone);let url='https://wa.me/'+phone+'?text='+encodeURIComponent(msg);window.open(url,'_blank','noopener');},i*900)});alert(`Foram preparados ${valid.length} contatos. O navegador/WhatsApp pode bloquear algumas abas; nesse caso, abra os contatos individualmente pelo botão de roteiro.`)}
+
+function delTrip(id){if(confirm('Excluir esta excursão?')){data.trips=data.trips.filter(t=>t.id!=id);data.people=data.people.filter(p=>p.tripId!=id);save();render('trips')}}
+function people(){
+  const cards=data.trips.slice().sort((a,b)=>(a.departure||'').localeCompare(b.departure||'')).map(t=>{
+    const ps=data.people.filter(p=>p.tripId==t.id), paid=ps.filter(p=>paymentStatus(p)==='Confirmado').length, partial=ps.filter(p=>paymentStatus(p)==='Parcial').length, pending=ps.filter(p=>paymentStatus(p)==='Pendente').length;
+    return `<div class="trip-card" onclick="peopleDetail('${t.id}')"><div style="display:flex;justify-content:space-between;gap:10px"><div><h3>🚌 ${esc(t.destination)}</h3><div class="meta">${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''} · ${esc(t.origin||'')}</div></div><span class="pill ${t.published?'ok':''}">${t.published?'Publicado':'Privado'}</span></div><div class="stats"><div class="stat"><small>Passageiros</small><b>${ps.length} / ${totalSeats(t)}</b></div><div class="stat"><small>Pagos</small><b class="result-positive">${paid}</b></div><div class="stat"><small>Pendentes</small><b class="${pending?'result-negative':''}">${pending}</b>${partial?`<small style="margin-top:2px">${partial} parcial(is)</small>`:''}</div></div><div style="margin-top:13px;color:#0b5cff;font-size:12px;font-weight:800">Abrir passageiros →</div></div>`;
+  }).join('');
+  main.innerHTML=layout('Passageiros',`<div class="panel"><div class="section-heading"><div><h2>Passageiros por excursão</h2><p class="muted">Escolha uma excursão para visualizar dados pessoais, assentos e pagamentos.</p></div><button class="btn" onclick="personForm()">+ Novo passageiro</button></div>${cards?`<div class="trip-card-grid">${cards}</div>`:'<div class="empty">Cadastre uma excursão para começar a organizar os passageiros.</div>'}</div>`);
+}
+function peopleDetail(tid){
+  const t=data.trips.find(x=>x.id==tid); if(!t)return;
+  const ps=data.people.filter(p=>p.tripId==tid), paid=ps.reduce((a,p)=>a+paymentTotal(p),0), contract=ps.reduce((a,p)=>a+Number(p.value||0),0), pending=Math.max(0,contract-paid);
+  const rows=ps.map(p=>{let pp=paymentTotal(p),pend=Math.max(0,Number(p.value||0)-pp),st=paymentStatus(p);return `<tr><td><b>${esc(p.name)}</b><br><small>${esc(p.phone||'')}</small></td><td>${esc(p.cpf||'—')}</td><td>${esc(p.rg||'—')}</td><td>${p.seat?`💺 ${esc(p.seat)}`:'—'}</td><td>${money(p.value)}</td><td>${money(pp)}</td><td>${money(pend)}</td><td><span class="pill ${st==='Confirmado'?'ok':st==='Parcial'?'warn':''}">${st}</span></td><td><div class="action-buttons"><button class="btn secondary" onclick="paymentForm('${p.id}')">💳 Pagamentos</button><button class="btn secondary" onclick="personForm('${p.id}')">Editar</button><button class="btn danger" onclick="delPerson('${p.id}');peopleDetail('${tid}')">Excluir</button></div></td></tr>`}).join('');
+  main.innerHTML=layout('Passageiros',`<div class="panel"><div class="passenger-detail-head"><div><button class="btn secondary" onclick="render('people')">← Voltar às excursões</button><div style="margin-top:14px"><div class="admin-eyebrow">PASSAGEIROS DA EXCURSÃO</div><h2 style="margin:4px 0">🚌 ${esc(t.destination)}</h2><p class="muted">${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''} · ${esc(t.origin||'')}</p></div></div><div class="summary"><span class="mini-pill">👥 ${ps.length} passageiros</span><span class="mini-pill">💳 ${money(paid)} recebidos</span><span class="mini-pill">⏳ ${money(pending)} pendentes</span></div></div></div><div class="panel"><div class="section-heading"><div><h2>Lista de passageiros</h2><p class="muted">Dados pessoais, assentos e situação de pagamento.</p></div><button class="btn" onclick="personForm('', '${t.id}')">+ Adicionar passageiro</button></div>${rows?`<div style="overflow:auto"><table class="table"><tr><th>Passageiro</th><th>CPF</th><th>RG</th><th>Assento</th><th>Valor</th><th>Pago</th><th>Pendente</th><th>Status</th><th></th></tr>${rows}</table></div>`:'<div class="empty">Nenhum passageiro cadastrado nesta excursão.</div>'}</div>`);
+}
+
+function personForm(id,presetTripId=''){let existing=data.people.find(x=>x.id==id),p=existing||{name:'',birth:'',cpf:'',rg:'',address:'',phone:'',tripId:presetTripId,seat:'',value:'',paid:'',status:'Pendente'};let selectedTrip=p.tripId||presetTripId;openModal(`<h2>${id?'Editar':'Novo'} passageiro</h2><form onsubmit="savePerson(event,'${id||''}')"><div class="formgrid"><div class="field"><label>Nome completo</label><input name="name" value="${esc(p.name)}" required></div><div class="field"><label>Data de nascimento</label><input type="date" name="birth" value="${p.birth||''}" required></div><div class="field"><label>CPF</label><input name="cpf" value="${esc(p.cpf)}" required></div><div class="field"><label>Identidade / RG</label><input name="rg" value="${esc(p.rg)}" required></div><div class="field full"><label>Endereço completo</label><input name="address" value="${esc(p.address)}" required></div><div class="field"><label>Telefone / WhatsApp</label><input name="phone" value="${esc(p.phone)}" required></div><div class="field"><label>Excursão</label><select name="tripId"><option value="">Selecione</option>${data.trips.map(t=>`<option value="${t.id}" ${selectedTrip==t.id?'selected':''}>${esc(t.destination)} — ${fmt(t.departure)}</option>`).join('')}</select></div><div class="field"><label>Veículo</label><select name="vehicleIndex"><option value="">Selecione</option>${(data.trips.find(t=>t.id==selectedTrip)?.vehicles||[]).map((v,i)=>`<option value="${i}" ${Number(p.vehicleIndex||0)===i?'selected':''}>${esc(vehicleLabel(v,i))} · ${v.seats} lugares</option>`).join('')}</select></div><div class="field"><label>Assento</label><input name="seat" value="${esc(p.seat||'')}" placeholder="Ex.: 12"></div><div class="field"><label>Valor da viagem</label><input type="number" step="0.01" min="0" name="value" value="${p.value||''}"></div><div class="field"><label>Status</label><select name="status"><option ${p.status==='Pendente'?'selected':''}>Pendente</option><option ${p.status==='Parcial'?'selected':''}>Parcial</option><option ${p.status==='Confirmado'?'selected':''}>Confirmado</option><option ${p.status==='Cancelado'?'selected':''}>Cancelado</option></select></div></div><div class="notice" style="margin-top:12px">💳 O pagamento pode ser atualizado manualmente aqui, mesmo quando a venda foi feita fora do portal do cliente.</div><div class="actions"><button type="button" class="btn secondary" onclick="closeModal()">Cancelar</button>${id?`<button type="button" class="btn secondary" onclick="closeModal();paymentForm('${id}')">💳 Ver pagamentos</button>`:''}<button class="btn">Salvar</button></div></form>`)}
+function savePerson(e,id){e.preventDefault();let f=new FormData(e.target),existing=id?data.people.find(p=>p.id==id):null,o={id:id||Date.now().toString(),name:f.get('name'),birth:f.get('birth'),cpf:f.get('cpf'),rg:f.get('rg'),address:f.get('address'),phone:f.get('phone'),tripId:f.get('tripId'),seat:f.get('seat'),vehicleIndex:f.get('vehicleIndex')===''?'':Number(f.get('vehicleIndex')),value:Number(f.get('value')||0),paid:existing?Number(existing.paid||0):0,status:f.get('status')};if(id)data.people[data.people.findIndex(p=>p.id==id)]=Object.assign({},existing,o);else data.people.push(o);closeModal();save();render('people')}
+
+function paymentForm(pid){let p=data.people.find(x=>x.id==pid);if(!p)return;let arr=passengerPayments(pid),paid=paymentTotal(p),pending=Math.max(0,Number(p.value||0)-paid);openModal(`<h2>💳 Pagamentos — ${esc(p.name)}</h2><div class="cards" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:16px"><div class="card"><small>Valor da viagem</small><strong>${money(p.value)}</strong></div><div class="card"><small>Total pago</small><strong>${money(paid)}</strong></div><div class="card"><small>Saldo</small><strong>${money(pending)}</strong></div></div><div class="section-heading"><div><h3>Histórico de pagamentos</h3><p class="muted">Cada lançamento fica registrado individualmente.</p></div><button class="btn" onclick="closeModal();newPayment('${pid}')">+ Registrar pagamento</button></div>${arr.length?`<table class="table"><tr><th>Data</th><th>Forma</th><th>Valor</th><th>Observação</th><th></th></tr>${arr.map(x=>`<tr><td>${fmt(x.date)}</td><td>${paymentMethodLabel(x.method)}</td><td><b>${money(x.amount)}</b></td><td>${esc(x.note||'—')}</td><td><button class="btn danger" onclick="deletePayment('${x.id}','${pid}')">Excluir</button></td></tr>`).join('')}</table>`:(p.paid?`<div class="notice">Pagamento anterior de ${money(p.paid)} está registrado no cadastro antigo. Ao registrar um novo pagamento, ele será incorporado ao histórico.</div>`:'<div class="empty">Nenhum pagamento registrado.</div>')}<div class="actions"><button class="btn secondary" onclick="closeModal()">Fechar</button></div>`)}
+function newPayment(pid){let p=data.people.find(x=>x.id==pid);if(!p)return;openModal(`<h2>Registrar pagamento</h2><form onsubmit="savePayment(event,'${pid}')"><div class="formgrid"><div class="field"><label>Data</label><input type="date" name="date" value="${new Date().toISOString().slice(0,10)}" required></div><div class="field"><label>Forma de pagamento</label><select name="method"><option>Pix</option><option>Cartão</option><option>Dinheiro</option><option>Transferência</option></select></div><div class="field"><label>Valor</label><input type="number" step="0.01" min="0.01" max="${Math.max(0,Number(p.value||0)-paymentTotal(p)).toFixed(2)}" name="amount" value="${Math.max(0,Number(p.value||0)-paymentTotal(p)).toFixed(2)}" required></div><div class="field full"><label>Observação</label><input name="note" placeholder="Ex.: 2ª parcela, sinal, pagamento final..."></div></div><div class="notice">Saldo atual: <b>${money(Math.max(0,Number(p.value||0)-paymentTotal(p)))}</b></div><div class="actions"><button type="button" class="btn secondary" onclick="closeModal();paymentForm('${pid}')">Cancelar</button><button class="btn">Salvar pagamento</button></div></form>`)}
+function savePayment(e,pid){e.preventDefault();let p=data.people.find(x=>x.id==pid);if(!p)return;let f=new FormData(e.target),amount=Number(f.get('amount')||0);if(amount<=0)return alert('Informe um valor válido.');let existing=passengerPayments(pid);if(!existing.length&&Number(p.paid||0)>0){data.payments.push({id:'legacy-'+pid,personId:pid,date:new Date().toISOString().slice(0,10),amount:Number(p.paid||0),method:'Transferência',note:'Pagamento anterior importado'});}data.payments.push({id:Date.now().toString(),personId:pid,date:f.get('date'),amount,method:f.get('method'),note:f.get('note')});p.paid=paymentTotal(p);p.status=paymentStatus(p);closeModal();save();setTimeout(()=>paymentForm(pid),50)}
+function deletePayment(id,pid){if(!confirm('Excluir este pagamento?'))return;data.payments=data.payments.filter(x=>x.id!=id);let p=data.people.find(x=>x.id==pid);if(p){p.paid=paymentTotal(p);p.status=paymentStatus(p)}save();setTimeout(()=>paymentForm(pid),50)}
+function delPerson(id){if(confirm('Excluir passageiro e seu histórico de pagamentos?')){data.people=data.people.filter(p=>p.id!=id);data.payments=data.payments.filter(x=>x.personId!=id);save();render('people')}}
+
+function charterIsFinancial(c){return ['Fechado','Contratado','Em andamento','Concluído'].includes(c?.status||'');}
+function charterFinancialContract(c){return charterIsFinancial(c)?Number(c.value||0):0;}
+function charterFinancialReceived(c){return charterIsFinancial(c)?Number(c.deposit||0):0;}
+function charterStatusClass(status){
+  if(['Concluído'].includes(status)) return 'ok';
+  if(['Cancelado'].includes(status)) return 'danger';
+  if(['Fechado','Contratado','Em andamento','Concluído','Aprovado'].includes(status)) return 'ok';
+  if(['Aguardando fechamento','Pendente','Em negociação','Orçamento','Orçamento solicitado'].includes(status)) return 'warn';
+  return '';
+}
+function charterRemaining(c){
+  if(!charterIsFinancial(c)) return 0;
+  return Math.max(0, Number(c.value||0)-Number(c.deposit||0));
+}
+function charterStatusOptions(selected){
+  const opts=['Aguardando fechamento','Pendente','Fechado','Em andamento','Concluído','Cancelado','Orçamento solicitado','Orçamento','Em negociação','Aprovado','Contratado'];
+  return opts.map(x=>`<option ${selected===x?'selected':''}>${x}</option>`).join('');
+}
+function charters(){
+  const total=data.charters.length;
+  const requested=data.charters.filter(c=>['Aguardando fechamento','Pendente','Orçamento solicitado','Orçamento','Em negociação','Aprovado'].includes(c.status)).length;
+  const contracted=data.charters.filter(c=>['Fechado','Contratado','Em andamento','Concluído'].includes(c.status)).length;
+  const received=data.charters.reduce((a,c)=>a+Number(c.deposit||0),0);
+  const pending=data.charters.reduce((a,c)=>a+charterRemaining(c),0);
+  const rows=data.charters.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(c=>`
+    <tr>
+      <td><b>${esc(c.client)}</b><br><small>${esc(c.phone||'')}</small></td>
+      <td>${esc(c.origin||'—')} → <b>${esc(c.destination)}</b><br><small>${Number(c.passengers||0)||'—'} passageiros · ${esc(c.vehicle||'A definir')}</small></td>
+      <td>${fmt(c.date)}${c.returnDate?' → '+fmt(c.returnDate):''}</td>
+      <td>${charterIsFinancial(c)?money(c.value||0):'<span class="muted">Não contratado</span>'}${c.quoteValue?`<br><small>Orçado: ${money(c.quoteValue)}</small>`:''}</td>
+      <td>${money(c.deposit||0)}<br><small>A receber: ${money(charterRemaining(c))}</small></td>
+      <td><span class="pill ${charterStatusClass(c.status)}">${esc(c.status||'Orçamento solicitado')}</span></td>
+      <td>
+        <button class="btn secondary" onclick="charterDetail('${c.id}')">Ver</button>
+        <button class="btn secondary" onclick="charterForm('${c.id}')">Editar</button>
+        <button class="btn danger" onclick="delCharter('${c.id}')">Excluir</button>
+      </td>
+    </tr>`).join('');
+
+  main.innerHTML=layout('Fretamentos',`
+    <div class="cards">
+      <div class="card"><small>Total de solicitações</small><strong>${total}</strong></div>
+      <div class="card"><small>Em negociação / orçamento</small><strong>${requested}</strong></div>
+      <div class="card"><small>Contratados / em andamento</small><strong>${contracted}</strong></div>
+      <div class="card"><small>A receber</small><strong>${money(pending)}</strong></div>
+    </div>
+
+    <div class="panel">
+      <div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div><h2>Solicitações de fretamento</h2><p class="muted">Acompanhe o pedido desde o primeiro contato até a conclusão do serviço.</p></div>
+        <button class="btn" onclick="charterForm()">+ Novo fretamento</button>
+      </div>
+      ${rows?`<div style="overflow:auto"><table class="table"><tr><th>Cliente</th><th>Rota / grupo</th><th>Data</th><th>Valor contratado</th><th>Recebido</th><th>Status</th><th></th></tr>${rows}</table></div>`:'<div class="empty">Nenhum fretamento cadastrado. Solicitações feitas pelo portal do cliente aparecerão aqui.</div>'}
+    </div>
+
+    <div class="panel">
+      <div class="section-heading"><div><h2>Fluxo do fretamento</h2><p class="muted">Use os status para saber exatamente em que etapa cada cliente está.</p></div></div>
+      <div class="freight-flow">
+        <div><b>1</b><span>Solicitação</span></div><i>→</i>
+        <div><b>2</b><span>Orçamento</span></div><i>→</i>
+        <div><b>3</b><span>Negociação</span></div><i>→</i>
+        <div><b>4</b><span>Aprovado</span></div><i>→</i>
+        <div><b>5</b><span>Contratado</span></div><i>→</i>
+        <div><b>6</b><span>Concluído</span></div>
+      </div>
+    </div>
+  `);
+}
+function charterDetail(id){
+  const c=data.charters.find(x=>x.id==id); if(!c)return;
+  const status=c.status||'Aguardando fechamento';
+  const quote=Number(c.quoteValue||0);
+  openModal(`
+    <div class="quote-head">
+      <div><div class="admin-eyebrow">PEDIDO DE ORÇAMENTO</div><h2 style="margin:3px 0">🚐 ${esc(c.client)}</h2><p class="muted">Confira os dados enviados e prepare a resposta.</p></div>
+      <span class="pill ${charterStatusClass(status)}">${esc(status)}</span>
+    </div>
+    <div class="quote-request">
+      <div class="quote-row"><span>👤 Cliente</span><b>${esc(c.client)}</b></div>
+      <div class="quote-row"><span>📱 WhatsApp</span><b>${esc(c.phone||'Não informado')}</b></div>
+      <div class="quote-row"><span>📍 Saída</span><b>${esc(c.origin||'Não informado')}</b></div>
+      <div class="quote-row"><span>📍 Destino</span><b>${esc(c.destination||'Não informado')}</b></div>
+      <div class="quote-row"><span>📅 Ida</span><b>${fmt(c.date)}${c.departureTime?' às '+esc(c.departureTime):''}</b></div>
+      <div class="quote-row"><span>📅 Retorno</span><b>${c.returnDate?fmt(c.returnDate)+(c.returnTime?' às '+esc(c.returnTime):''):'Somente ida'}</b></div>
+      <div class="quote-row"><span>👥 Passageiros</span><b>${Number(c.passengers||0)||'Não informado'}</b></div>
+      <div class="quote-row"><span>🚐 Veículo solicitado</span><b>${esc(c.vehicle||'A definir')}</b></div>
+      ${c.notes?`<div class="quote-notes"><span>📝 Observações</span><p>${esc(c.notes)}</p></div>`:''}
+    </div>
+    <div class="quote-answer">
+      <div class="admin-eyebrow">RESPOSTA DO ORÇAMENTO</div>
+      <div class="formgrid">
+        <div class="field"><label>Veículo mais indicado para a viagem</label><select id="quoteAnswerVehicle" onchange="updateQuotePreview('${c.id}')">
+          ${['Van','Ônibus','Van + Ônibus','2 Ônibus'].map(v=>`<option ${((c.recommendedVehicle||c.vehicle)==v)?'selected':''}>${v}</option>`).join('')}
+        </select></div>
+        <div class="field"><label>Valor do orçamento (R$)</label><input id="quoteAnswerValue" type="number" min="0" step="0.01" value="${quote||''}" placeholder="Ex.: 3500" oninput="updateQuotePreview('${c.id}')"></div>
+        <div class="field"><label>Validade do orçamento</label><input id="quoteAnswerValidity" placeholder="Ex.: 7 dias" oninput="updateQuotePreview('${c.id}')"></div>
+      </div>
+      <div class="field"><label>Tipo de mensagem para o cliente</label><select id="quoteMessageType" onchange="toggleQuoteMessageType('${c.id}')">
+        <option value="quote">📋 Enviar orçamento</option>
+        <option value="unavailable">🚫 Sem disponibilidade de veículo</option>
+        <option value="custom">✏️ Mensagem personalizada</option>
+      </select></div>
+      <div id="quoteUnavailableWrap" class="quote-unavailable" style="display:none"><b>Mensagem de indisponibilidade</b><p>Será enviada uma mensagem informando que não há veículo disponível na data solicitada, junto com os dados da viagem.</p></div>
+      <div class="quote-preview"><b>Mensagem que será enviada:</b><textarea id="quotePreview" rows="8" placeholder="Digite aqui a informação que deseja enviar ao cliente."></textarea></div>
+    </div>
+    <div class="actions">
+      <button class="btn secondary" onclick="closeModal()">Fechar</button>
+      <button class="btn" onclick="sendQuoteWhatsApp('${c.id}')">📲 Enviar orçamento pelo WhatsApp</button>
+    </div>
+  `);
+  toggleQuoteMessageType(c.id);
+}
+function toggleQuoteMessageType(id){
+  const type=document.getElementById('quoteMessageType')?.value||'quote';
+  const unavailableWrap=document.getElementById('quoteUnavailableWrap');
+  const preview=document.getElementById('quotePreview');
+  const quoteFields=document.getElementById('quoteAnswerValue');
+  const validity=document.getElementById('quoteAnswerValidity');
+  const vehicle=document.getElementById('quoteAnswerVehicle');
+  if(unavailableWrap) unavailableWrap.style.display=type==='unavailable'?'block':'none';
+  [quoteFields,validity,vehicle].forEach(el=>{if(el){const field=el.closest('.field');if(field)field.style.opacity=type==='quote'?'1':'.55'}});
+  if(preview){
+    if(type==='custom'){
+      preview.readOnly=false;
+      preview.placeholder='Digite aqui a informação que deseja enviar ao cliente.';
+      preview.value='Olá, '+((data.charters.find(x=>x.id==id)||{}).client||'')+'! 👋\n\n\nCL TUR Transporte & Turismo';
+      preview.style.cursor='text';
+      preview.style.background='white';
+    }else{
+      preview.readOnly=true;
+      preview.style.cursor='default';
+      preview.style.background='#f8fafc';
+      preview.value=buildQuoteMessage(id);
+    }
+  }
+}
+function updateQuotePreview(id){
+  const p=document.getElementById('quotePreview');
+  const type=document.getElementById('quoteMessageType')?.value||'quote';
+  if(p && type!=='custom') p.value=buildQuoteMessage(id);
+}
+function buildQuoteMessage(id){
+  const c=data.charters.find(x=>x.id==id); if(!c)return '';
+  const type=document.getElementById('quoteMessageType')?.value||'quote';
+  const value=Number(document.getElementById('quoteAnswerValue')?.value||0);
+  let validity=(document.getElementById('quoteAnswerValidity')?.value||'').trim(); if(validity && /^\d+$/.test(validity)) validity += ' dias';
+  const vehicle=(document.getElementById('quoteAnswerVehicle')?.value||c.vehicle||'A definir');
+  const custom=(document.getElementById('quotePreview')?.value||'').trim();
+  const nl=String.fromCharCode(10);
+  if(type==='unavailable'){
+    return 'Olá, '+c.client+'! 👋'+nl+nl+
+      'Agradecemos seu contato com a CL TUR Transporte & Turismo.'+nl+nl+
+      'Recebemos sua solicitação de fretamento para:'+nl+
+      '📍 Saída: '+(c.origin||'Não informado')+nl+
+      '📍 Destino: '+(c.destination||'Não informado')+nl+
+      '📅 Ida: '+(fmt(c.date)+(c.departureTime?' às '+c.departureTime:''))+nl+
+      '📅 Retorno: '+(c.returnDate?fmt(c.returnDate)+(c.returnTime?' às '+c.returnTime:''):'Somente ida')+nl+
+      '👥 Passageiros: '+(c.passengers||'Não informado')+nl+nl+
+      '🚫 No momento, não temos veículo disponível para atender essa solicitação na data informada.'+nl+nl+
+      'Se houver alteração na data, teremos prazer em verificar uma nova disponibilidade para você.'+nl+nl+
+      'CL TUR Transporte & Turismo';
+  }
+  if(type==='custom'){
+    return 'Olá, '+c.client+'! 👋'+nl+nl+
+      (custom||'')+nl+nl+
+      'CL TUR Transporte & Turismo';
+  }
+  let msg='Olá, '+c.client+'! 👋'+nl+nl+
+    'Recebemos sua solicitação de fretamento da CL TUR.'+nl+nl+
+    '📍 Saída: '+(c.origin||'Não informado')+nl+
+    '📍 Destino: '+(c.destination||'Não informado')+nl+
+    '📅 Ida: '+(fmt(c.date)+(c.departureTime?' às '+c.departureTime:''))+nl+
+    '📅 Retorno: '+(c.returnDate?fmt(c.returnDate)+(c.returnTime?' às '+c.returnTime:''):'Somente ida')+nl+
+    '👥 Passageiros: '+(c.passengers||'Não informado')+nl+
+    '🚐 Veículo mais indicado: '+vehicle+nl+
+    '💰 Valor do orçamento: '+(value?money(value):'A combinar');
+  if(validity)msg+=nl+'⏳ Validade: '+validity;
+  msg+=nl+nl+'CL TUR Transporte & Turismo';
+  return msg;
+}
+
+function updateQuotePreview(id){
+  const p=document.getElementById('quotePreview');
+  const type=document.getElementById('quoteMessageType')?.value||'quote';
+  if(p && type!=='custom') p.value=buildQuoteMessage(id);
+}
+function whatsappBR(phone){
+  let n=String(phone??'').replace(/\D/g,'');
+  if(n.startsWith('00')) n=n.slice(2);
+  if(n.startsWith('55') && (n.length===12 || n.length===13)) return n;
+  if(n.length===10 || n.length===11) return '55'+n;
+  return n;
+}
+function sendQuoteWhatsApp(id){
+  const c=data.charters.find(x=>x.id==id); if(!c)return;
+  const type=document.getElementById('quoteMessageType')?.value||'quote';
+  const value=Number(document.getElementById('quoteAnswerValue')?.value||0);
+  if(type==='quote' && !value){alert('Informe o valor do orçamento antes de enviar.');return}
+  if(type==='custom' && !(document.getElementById('quotePreview')?.value||'').trim()){alert('Digite a mensagem personalizada no quadro de mensagem antes de enviar.');return}
+  if(type==='quote'){
+    c.quoteValue=value;
+    c.recommendedVehicle=document.getElementById('quoteAnswerVehicle')?.value||c.vehicle;
+    if(!charterIsFinancial(c)) c.status='Aguardando fechamento';
+  }else if(type==='unavailable'){
+    if(!charterIsFinancial(c)) c.status='Aguardando fechamento';
+  }else if(type==='custom'){
+    if(!charterIsFinancial(c)) c.status='Aguardando fechamento';
+  }
+  c.updatedAt=new Date().toISOString();
+  save();
+  const phone=whatsappBR(c.phone);
+  if(!phone || !(phone.length===12 || phone.length===13) || !phone.startsWith('55')){
+    alert('O WhatsApp precisa ter DDD e número válido. Exemplo: 34991851948.');
+    return;
+  }
+  const msg=buildQuoteMessage(id);
+  const url='https://api.whatsapp.com/send?phone='+phone+'&text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+  closeModal();
+}
+
+function charterForm(id){
+  let c=data.charters.find(x=>x.id==id)||{
+    client:'',phone:'',origin:'',destination:'',date:'',departureTime:'',returnDate:'',returnTime:'',passengers:'',
+    vehicle:'A definir',quoteValue:'',value:'',deposit:'',status:'Aguardando fechamento',notes:''
+  };
+  openModal(`<h2>${id?'Editar':'Novo'} fretamento</h2>
+  <p class="muted">Registre o pedido e acompanhe todas as etapas do serviço.</p>
+  <form onsubmit="saveCharter(event,'${id||''}')">
+    <div class="formgrid">
+      <div class="field"><label>Cliente</label><input name="client" value="${esc(c.client)}" required></div>
+      <div class="field"><label>Telefone / WhatsApp</label><input name="phone" value="${esc(c.phone||'')}" required></div>
+      <div class="field"><label>Local de saída</label><input name="origin" value="${esc(c.origin||'')}" required></div>
+      <div class="field"><label>Destino</label><input name="destination" value="${esc(c.destination)}" required></div>
+      <div class="field"><label>Data de saída</label><input type="date" name="date" value="${c.date}" required></div>
+      <div class="field"><label>Hora de saída</label><input type="time" name="departureTime" value="${c.departureTime||''}" required></div>
+      <div class="field"><label>Data de retorno</label><input type="date" name="returnDate" value="${c.returnDate||''}"></div>
+      <div class="field"><label>Hora do retorno</label><input type="time" name="returnTime" value="${c.returnTime||''}"></div>
+      <div class="field"><label>Quantidade de passageiros</label><input type="number" min="1" name="passengers" value="${c.passengers||''}"></div>
+      <div class="field"><label>Veículo desejado</label><select name="vehicle">
+        ${['A definir','Van','Ônibus','Van + Ônibus','2 Ônibus'].map(x=>`<option ${c.vehicle===x?'selected':''}>${x}</option>`).join('')}
+      </select></div>
+      <div class="field"><label>Valor do orçamento</label><input type="number" step="0.01" min="0" name="quoteValue" value="${c.quoteValue||''}" placeholder="Valor apresentado ao cliente"></div>
+      <div class="field"><label>Valor contratado</label><input type="number" step="0.01" min="0" name="value" value="${c.value||''}"></div>
+      <div class="field"><label>Valor recebido / sinal</label><input type="number" step="0.01" min="0" name="deposit" value="${c.deposit||''}"></div>
+      <div class="field"><label>Status</label><select name="status">${charterStatusOptions(c.status||'Orçamento solicitado')}</select></div>
+      <div class="field full"><label>Observações</label><textarea name="notes" placeholder="Horários, paradas, bagagem, evento, necessidades especiais etc.">${esc(c.notes||'')}</textarea></div>
+    </div>
+    <div class="actions"><button type="button" class="btn secondary" onclick="closeModal()">Cancelar</button><button class="btn">Salvar fretamento</button></div>
+  </form>`);
+}
+function saveCharter(e,id){
+  e.preventDefault();
+  let f=new FormData(e.target);
+  let old=id?data.charters.find(c=>c.id==id):null;
+  let o={
+    id:id||Date.now().toString(),
+    client:f.get('client'),
+    phone:f.get('phone'),
+    origin:f.get('origin'),
+    destination:f.get('destination'),
+    date:f.get('date'),
+    departureTime:f.get('departureTime')||'',
+    returnDate:f.get('returnDate'),
+    returnTime:f.get('returnTime')||'',
+    passengers:Number(f.get('passengers')||0),
+    vehicle:f.get('vehicle')||'A definir',
+    quoteValue:Number(f.get('quoteValue')||0),
+    value:Number(f.get('value')||0),
+    deposit:Number(f.get('deposit')||0),
+    status:f.get('status')||'Aguardando fechamento',
+    notes:f.get('notes')||'',
+    createdAt:old?.createdAt||new Date().toISOString(),
+    updatedAt:new Date().toISOString()
+  };
+  if(id)data.charters[data.charters.findIndex(c=>c.id==id)]=o;
+  else data.charters.push(o);
+  closeModal();save();render('charters');
+}
+function delCharter(id){
+  if(confirm('Excluir este fretamento? Esta ação não poderá ser desfeita.')){
+    data.charters=data.charters.filter(c=>c.id!=id);
+    save();render('charters');
+  }
+}
+
+function finance(){
+  const tripCards=data.trips.slice().sort((a,b)=>(a.departure||'').localeCompare(b.departure||'')).map(t=>{const ps=data.people.filter(p=>p.tripId==t.id),contract=ps.reduce((a,p)=>a+Number(p.value||0),0),received=ps.reduce((a,p)=>a+paymentTotal(p),0),ex=data.expenses.filter(e=>e.tripId==t.id&&!e.charterId).reduce((a,e)=>a+Number(e.value||0),0),planned=Number(t.costs||0),result=received-ex,projected=contract-planned;return `<div class="finance-card" onclick="tripFinance('${t.id}')"><div style="display:flex;justify-content:space-between;gap:10px"><div><h3>🚌 ${esc(t.destination)}</h3><div class="meta">${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''}</div></div><span class="finance-result-badge ${result>=0?'pill ok':'pill danger'}">${result>=0?'Lucro':'Prejuízo'}</span></div><div class="stats"><div class="stat"><small>Recebido</small><b>${money(received)}</b></div><div class="stat"><small>Custos</small><b>${money(ex)}</b></div><div class="stat"><small>A receber</small><b>${money(Math.max(0,contract-received))}</b></div></div><div class="result"><span>Resultado atual</span><b class="${result>=0?'result-positive':'result-negative'}">${money(result)}</b></div></div>`}).join('');
+  const charterCards=data.charters.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(c=>{const contract=charterFinancialContract(c),received=charterFinancialReceived(c),ex=data.expenses.filter(e=>e.charterId==c.id).reduce((a,e)=>a+Number(e.value||0),0),isFinancial=charterIsFinancial(c),result=isFinancial?received-ex:0,status=c.status||'Aguardando fechamento';return `<div class="finance-card" onclick="charterFinance('${c.id}')"><div style="display:flex;justify-content:space-between;gap:10px"><div><h3>🚐 ${esc(c.client||'Fretamento')}</h3><div class="meta">${fmt(c.date)}${c.returnDate?' → '+fmt(c.returnDate):''}</div></div><span class="finance-result-badge ${isFinancial?(result>=0?'pill ok':'pill danger'):'pill warn'}">${isFinancial?(result>=0?'Lucro':'Prejuízo'):esc(status)}</span></div><div class="stats"><div class="stat"><small>Recebido</small><b>${money(received)}</b></div><div class="stat"><small>Custos</small><b>${money(ex)}</b></div><div class="stat"><small>${isFinancial?'A receber':'Orçamento'}</small><b>${isFinancial?money(Math.max(0,contract-received)):money(Number(c.quoteValue||0))}</b></div></div><div class="result"><span>${isFinancial?'Resultado atual':'Situação'}</span><b class="${isFinancial?(result>=0?'result-positive':'result-negative'):''}">${isFinancial?money(result):esc(status)}</b></div></div>`}).join('');
+  const passengerContracted=data.people.reduce((a,p)=>a+Number(p.value||0),0), passengerReceived=data.people.reduce((a,p)=>a+paymentTotal(p),0), charterContracted=data.charters.reduce((a,c)=>a+charterFinancialContract(c),0), charterReceived=data.charters.reduce((a,c)=>a+charterFinancialReceived(c),0), revenue=passengerContracted+charterContracted, received=passengerReceived+charterReceived, spent=data.expenses.reduce((a,e)=>a+Number(e.value||0),0), current=received-spent, projected= revenue-data.trips.reduce((a,t)=>a+Number(t.costs||0),0)-spent;
+  main.innerHTML=layout('Financeiro',`<div class="cards"><div class="card"><small>Receita contratada</small><strong>${money(revenue)}</strong></div><div class="card"><small>Total recebido</small><strong>${money(received)}</strong></div><div class="card"><small>Total a receber</small><strong>${money(Math.max(0,revenue-received))}</strong></div><div class="card"><small>Custos realizados</small><strong>${money(spent)}</strong></div><div class="card"><small>Saldo atual</small><strong class="${current>=0?'result-positive':'result-negative'}">${money(current)}</strong></div><div class="card"><small>Resultado projetado</small><strong class="${projected>=0?'result-positive':'result-negative'}">${money(projected)}</strong></div></div><div class="panel"><div class="finance-section-title"><div><h2>Excursões</h2><p class="muted">Clique em uma viagem para abrir receitas, custos e lucro/prejuízo.</p></div><button class="btn" onclick="expenseForm()">+ Lançar despesa</button></div>${tripCards?`<div class="finance-card-grid">${tripCards}</div>`:'<div class="empty">Nenhuma excursão cadastrada.</div>'}</div><div class="panel"><div class="finance-section-title"><div><h2>Fretamentos</h2><p class="muted">Controle separado dos custos e resultados de cada frete.</p></div><button class="btn secondary" onclick="expenseForm()">+ Lançar despesa</button></div>${charterCards?`<div class="finance-card-grid">${charterCards}</div>`:'<div class="empty">Nenhum fretamento cadastrado.</div>'}</div><div class="panel"><div class="finance-section-title"><div><h2>Últimas despesas</h2><p class="muted">Combustível, pedágio, hotel, outro veículo e outros custos.</p></div></div>${data.expenses.length?`<div style="overflow:auto"><table class="table"><tr><th>Data</th><th>Descrição do custo</th><th>Operação</th><th>Valor</th><th></th></tr>${data.expenses.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,30).map(e=>`<tr><td>${fmt(e.date)}</td><td><b>${esc(e.description)}</b></td><td>${e.charterId?`🚐 ${esc(data.charters.find(c=>c.id==e.charterId)?.client||'Fretamento')}`:e.tripId&&e.tripId!=='general'?`🚌 ${esc(tripName(e.tripId))}`:'Geral'}</td><td>${money(e.value)}</td><td><div class="action-buttons"><button class="btn secondary" onclick="expenseForm('${e.id}')">Editar</button><button class="btn danger" onclick="delExpense('${e.id}')">Excluir</button></div></td></tr>`).join('')}</table></div>`:'<div class="empty">Nenhuma despesa lançada.</div>'}</div>`);
+}
+function expenseForm(id,tripId='general',charterId=''){
+  let e=data.expenses.find(x=>x.id==id)||{date:new Date().toISOString().slice(0,10),description:'',category:'',tripId:tripId,charterId:charterId,value:'',notes:''};
+  let selected=e.charterId?`charter:${e.charterId}`:(e.tripId&&e.tripId!=='general'?`trip:${e.tripId}`:'general');
+  const valueDisplay=e.value!==''&&e.value!=null?Number(e.value).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'';
+  openModal(`<h2>${id?'Editar':'Nova'} despesa</h2><form onsubmit="saveExpense(event,'${id||''}')"><div class="formgrid expense-form-grid"><div class="field"><label>Data</label><input type="date" name="date" value="${e.date||''}" required></div><div class="field"><label>Vincular despesa a</label><select name="operation"><option value="general" ${selected==='general'?'selected':''}>Geral / administrativo</option><optgroup label="Excursões">${data.trips.map(t=>`<option value="trip:${t.id}" ${selected===`trip:${t.id}`?'selected':''}>🚌 ${esc(t.destination)} — ${fmt(t.departure)}</option>`).join('')}</optgroup><optgroup label="Fretamentos">${data.charters.map(c=>`<option value="charter:${c.id}" ${selected===`charter:${c.id}`?'selected':''}>🚐 ${esc(c.client||'Fretamento')} — ${fmt(c.date)}</option>`).join('')}</optgroup></select></div><div class="field"><label>Valor (R$)</label><div class="currency-field"><span>R$</span><input type="text" inputmode="decimal" name="value" value="${valueDisplay}" placeholder="0,00" required></div></div><div class="field full"><label>Descrição do custo</label><input name="description" value="${esc(e.description)}" placeholder="Ex.: Combustível, pedágio, hotel, outro veículo..." required></div><div class="field full"><label>Observações</label><textarea name="notes" placeholder="Informações adicionais sobre esta despesa...">${esc(e.notes||'')}</textarea></div></div><div class="actions"><button type="button" class="btn secondary" onclick="closeModal()">Cancelar</button><button class="btn">Salvar despesa</button></div></form>`)
+}
+
+function parseMoneyBR(value){
+  let v=String(value??'').trim().replace(/R\$\s?/g,'');
+  if(v.includes(',')) v=v.replace(/\./g,'').replace(',','.');
+  else v=v.replace(/[^0-9.-]/g,'');
+  return Number(v)||0;
+}
+function saveExpense(ev,id){ev.preventDefault();let f=new FormData(ev.target),operation=f.get('operation')||'general',tripId='general',charterId='';if(operation.startsWith('trip:'))tripId=operation.slice(5);if(operation.startsWith('charter:'))charterId=operation.slice(8);let old=id?data.expenses.find(e=>e.id==id):null,o={id:id||Date.now().toString(),date:f.get('date'),category:old?.category||'Outros',description:f.get('description'),tripId,charterId,value:parseMoneyBR(f.get('value')),notes:f.get('notes')};if(id){let i=data.expenses.findIndex(x=>x.id==id);if(i>=0)data.expenses[i]=o}else data.expenses.push(o);closeModal();save();render('finance')}
+
+function delExpense(id){if(confirm('Excluir esta despesa?')){data.expenses=data.expenses.filter(e=>e.id!=id);save();render('finance')}}
+function tripFinance(id){let t=data.trips.find(x=>x.id==id);if(!t)return;let ps=data.people.filter(p=>p.tripId==id),contract=ps.reduce((a,p)=>a+Number(p.value||0),0),received=ps.reduce((a,p)=>a+paymentTotal(p),0),pending=Math.max(0,contract-received),ex=data.expenses.filter(e=>e.tripId==id&&!e.charterId),spent=ex.reduce((a,e)=>a+Number(e.value||0),0),result=received-spent,projected=contract-Number(t.costs||0);openModal(`<h2>💰 Financeiro — ${esc(t.destination)}</h2><p>${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''} · ${totalSeats(t)} lugares</p><div class="cards" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="card"><small>Receita contratada</small><strong>${money(contract)}</strong></div><div class="card"><small>Total recebido</small><strong>${money(received)}</strong></div><div class="card"><small>A receber</small><strong>${money(pending)}</strong></div><div class="card"><small>Custos realizados</small><strong>${money(spent)}</strong></div><div class="card"><small>Custo previsto</small><strong>${money(t.costs)}</strong></div><div class="card"><small>Resultado projetado</small><strong class="${projected>=0?'result-positive':'result-negative'}">${money(projected)}</strong></div><div class="card"><small>Lucro / prejuízo atual</small><strong class="${result>=0?'result-positive':'result-negative'}">${money(result)}</strong></div></div><div class="section-heading"><div><h3>Custos da excursão</h3><p class="muted">Combustível, pedágio, hotel, outro veículo e outros.</p></div><button class="btn" onclick="closeModal();expenseForm('', '${id}')">+ Lançar custo</button></div>${ex.length?`<table class="table"><tr><th>Data</th><th>Descrição</th><th>Valor</th><th></th></tr>${ex.map(e=>`<tr><td>${fmt(e.date)}</td><td>${esc(e.description)}</td><td>${money(e.value)}</td><td><div class="action-buttons"><button class="btn secondary" onclick="expenseForm('${e.id}')">Editar</button><button class="btn danger" onclick="delExpense('${e.id}');tripFinance('${id}')">Excluir</button></div></td></tr>`).join('')}</table>`:'<div class="empty">Nenhum custo lançado para esta excursão.</div>'}<div class="section-heading"><div><h3>Pagamentos dos passageiros</h3><p class="muted">Acompanhe parcelas, valores recebidos e saldos.</p></div></div>${ps.length?`<table class="table"><tr><th>Passageiro</th><th>Valor</th><th>Pago</th><th>Pendente</th><th>Status</th><th></th></tr>${ps.map(p=>{let pp=paymentTotal(p),pend=Math.max(0,Number(p.value||0)-pp),st=paymentStatus(p);return `<tr><td>${esc(p.name)}</td><td>${money(p.value)}</td><td>${money(pp)}</td><td>${money(pend)}</td><td><span class="pill ${st==='Confirmado'?'ok':st==='Parcial'?'warn':''}">${esc(st)}</span></td><td><button class="btn secondary" onclick="paymentForm('${p.id}')">💳 Pagamentos</button></td></tr>`}).join('')}</table>`:'<div class="empty">Nenhum passageiro nesta excursão.</div>'}<div class="actions"><button class="btn secondary" onclick="closeModal()">Fechar</button></div>`)}
+function charterFinance(id){let c=data.charters.find(x=>x.id==id);if(!c)return;let isFinancial=charterIsFinancial(c),contract=charterFinancialContract(c),received=charterFinancialReceived(c),pending=Math.max(0,contract-received),ex=data.expenses.filter(e=>e.charterId==id),spent=ex.reduce((a,e)=>a+Number(e.value||0),0),result=isFinancial?received-spent:0,projected=isFinancial?contract-spent:0;openModal(`<h2>🚐 Financeiro — ${esc(c.client||'Fretamento')}</h2><p>${fmt(c.date)}${c.returnDate?' → '+fmt(c.returnDate):''} · ${esc(c.origin||'')} → ${esc(c.destination||'')}</p><div class="notice" style="margin-bottom:14px">Status: <b>${esc(c.status||'Aguardando fechamento')}</b>${!isFinancial?' · Este fretamento ainda não está contratado; o valor do orçamento não entra na receita contratada.':''}</div><div class="cards" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="card"><small>Valor contratado</small><strong>${money(contract)}</strong></div><div class="card"><small>Total recebido</small><strong>${money(received)}</strong></div><div class="card"><small>A receber</small><strong>${money(pending)}</strong></div><div class="card"><small>Custos realizados</small><strong>${money(spent)}</strong></div><div class="card"><small>Resultado projetado</small><strong>${isFinancial?money(projected):'—'}</strong></div><div class="card"><small>Lucro / prejuízo atual</small><strong>${isFinancial?money(result):'—'}</strong></div></div><div class="section-heading"><div><h3>Custos do fretamento</h3><p class="muted">Combustível, pedágio, outro veículo e outros.</p></div><button class="btn" onclick="closeModal();expenseForm('', 'general', '${id}')">+ Lançar custo</button></div>${ex.length?`<table class="table"><tr><th>Data</th><th>Descrição</th><th>Valor</th><th></th></tr>${ex.map(e=>`<tr><td>${fmt(e.date)}</td><td>${esc(e.description)}</td><td>${money(e.value)}</td><td><div class="action-buttons"><button class="btn secondary" onclick="expenseForm('${e.id}')">Editar</button><button class="btn danger" onclick="delExpense('${e.id}');charterFinance('${id}')">Excluir</button></div></td></tr>`).join('')}</table>`:'<div class="empty">Nenhum custo lançado para este fretamento.</div>'}<div class="actions"><button class="btn secondary" onclick="closeModal()">Fechar</button></div>`)}
+
+function calendar(){
+  const now=new Date(), v=data.calendarView||{year:now.getFullYear(),month:now.getMonth()};
+  data.calendarView=v;
+  const first=new Date(v.year,v.month,1), last=new Date(v.year,v.month+1,0);
+  const start=(first.getDay()+6)%7, days=last.getDate(), prevDays=new Date(v.year,v.month,0).getDate();
+  const events={};
+  const add=(date,e)=>{if(date)(events[date]??=[]).push(e)};
+  data.trips.forEach(t=>{add(t.departure,{type:'trip',id:t.id,label:'Excursão • '+t.destination,color:'blue'});if(t.returnDate)add(t.returnDate,{type:'trip',id:t.id,label:'Retorno • '+t.destination,color:'blue'})});
+  data.charters.forEach(c=>{add(c.date,{type:'charter',id:c.id,label:'Frete • '+c.destination,color:'red'});if(c.returnDate)add(c.returnDate,{type:'charter',id:c.id,label:'Retorno • '+c.destination,color:'red'})});
+  let cells='', total=Math.ceil((start+days)/7)*7;
+  for(let i=0;i<total;i++){
+    const num=i-start+1; let d,muted=false;
+    if(num<1){d=new Date(v.year,v.month-1,prevDays+num);muted=true}else if(num>days){d=new Date(v.year,v.month+1,num-days);muted=true}else d=new Date(v.year,v.month,num);
+    const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const ev=events[iso]||[], hasRed=ev.some(x=>x.color==='red');
+    const cls=['cal-day'];if(muted)cls.push('muted-day');if(ev.length)cls.push(hasRed?'has-red':'has-blue');
+    if(iso===new Date().toISOString().slice(0,10))cls.push('today');
+    cells+=`<div class="${cls.join(' ')}"><div class="cal-num">${d.getDate()}</div>${ev.slice(0,3).map(e=>`<button class="cal-event ${e.color}" onclick="${e.type==='trip'?`render('trips');setTimeout(()=>seatMap('${e.id}'),80)`:`charterDetail('${e.id}')`}">${esc(e.label)}</button>`).join('')}${ev.length>3?`<div class="cal-more">+${ev.length-3} evento(s)</div>`:''}</div>`;
+  }
+  const title=first.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  main.innerHTML=layout('Calendário',`
+    <div class="panel calendar-panel">
+      <div class="calendar-head"><div><div class="admin-eyebrow">AGENDA OPERACIONAL</div><h2 style="margin:3px 0;text-transform:capitalize">${title}</h2><p class="muted">Dias livres, excursões próprias e fretamentos em uma visão mensal.</p></div>
+      <div class="calendar-controls"><button class="btn secondary" onclick="calendarMove(-1)">‹</button><button class="btn secondary" onclick="calendarToday()">Hoje</button><button class="btn secondary" onclick="calendarMove(1)">›</button>
+      <select onchange="calendarSetMonth(this.value)">${Array.from({length:12},(_,i)=>`<option value="${i}" ${i===v.month?'selected':''}>${new Date(2000,i,1).toLocaleDateString('pt-BR',{month:'long'})}</option>`).join('')}</select>
+      <input type="number" min="2020" max="2100" value="${v.year}" onchange="calendarSetYear(this.value)"></div></div>
+      <div class="calendar-legend"><span><i class="legend-dot free"></i>Dia livre</span><span><i class="legend-dot blue"></i>Excursão própria</span><span><i class="legend-dot red"></i>Fretamento</span></div>
+      <div class="calendar-weekdays">${['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(x=>`<div>${x}</div>`).join('')}</div><div class="calendar-grid">${cells}</div>
+    </div>`);
+}
+function calendarMove(n){data.calendarView=data.calendarView||{year:new Date().getFullYear(),month:new Date().getMonth()};data.calendarView.month+=n;if(data.calendarView.month<0){data.calendarView.month=11;data.calendarView.year--}if(data.calendarView.month>11){data.calendarView.month=0;data.calendarView.year++}save();render('calendar')}
+function calendarToday(){const d=new Date();data.calendarView={year:d.getFullYear(),month:d.getMonth()};save();render('calendar')}
+function calendarSetMonth(v){data.calendarView=data.calendarView||{year:new Date().getFullYear(),month:new Date().getMonth()};data.calendarView.month=Number(v);save();render('calendar')}
+function calendarSetYear(v){data.calendarView=data.calendarView||{year:new Date().getFullYear(),month:new Date().getMonth()};data.calendarView.year=Number(v)||new Date().getFullYear();save();render('calendar')}
+function reports(){main.innerHTML=layout('Relatórios',`<div class="cards"><div class="card"><small>Excursões</small><strong>${data.trips.length}</strong></div><div class="card"><small>Passageiros</small><strong>${data.people.length}</strong></div><div class="card"><small>Fretamentos</small><strong>${data.charters.length}</strong></div><div class="card"><small>Publicadas</small><strong>${data.trips.filter(t=>t.published).length}</strong></div></div>`)}
+function publicPage(){let pub=data.trips.filter(t=>t.published);let cards=pub.map(t=>`<article class="card public-trip-card">${t.image?`<img class="public-trip-cover" src="${t.image}" alt="Arte de ${esc(t.destination)}">`:'<div class="public-trip-empty-cover">🚌</div>'}<div class="public-trip-body"><div class="public-preview-head"><div><small>${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''}</small><h2 style="margin:5px 0 0">${esc(t.destination)}</h2></div><span class="pill ok">Publicado</span></div><p class="muted">📍 ${esc(t.origin||'A confirmar')}</p><div class="public-trip-meta"><span>💰 ${money(t.price)}/pessoa</span><span>👥 ${Math.max(0,totalSeats(t)-occupied(t.id))} vagas</span><span>🚌 ${(t.vehicles||[]).map(v=>esc(v.type)).join(' + ')}</span></div><p class="muted">${esc(t.notes||'Excursão publicada na área do cliente.')}</p><button class="btn" onclick="reserve('${t.id}')">Ver detalhes e reservar →</button></div></article>`).join('');main.innerHTML=layout('Área do cliente',`<div class="panel"><div class="public-preview-head"><div><div class="admin-eyebrow">PRÉ-VISUALIZAÇÃO</div><h2 style="margin:4px 0">Área do cliente</h2><p class="muted">Veja como as excursões publicadas aparecem para os clientes.</p></div><span class="mini-pill">🌐 ${pub.length} publicada${pub.length===1?'':'s'}</span></div></div>${cards?`<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:stretch">${cards}</div>`:'<div class="panel"><div class="empty">Nenhuma excursão publicada no momento.</div></div>'}`)}
+function getNotifications(){try{return JSON.parse(localStorage.getItem('cltur_notifications_v1')||'[]')}catch(e){return []}}
+function addNotification(n){const list=getNotifications();if(list.some(x=>x.key===n.key))return;list.unshift({...n,key:n.key,id:Date.now().toString()+Math.random(),createdAt:new Date().toISOString(),read:false});localStorage.setItem('cltur_notifications_v1',JSON.stringify(list.slice(0,100)));updateNotificationBadge()}
+function syncFreightNotifications(){data.charters.filter(c=>['Aguardando fechamento','Orçamento solicitado'].includes(c.status)).forEach(c=>addNotification({key:'freight:'+c.id,kind:'freight',title:'Novo pedido de fretamento',text:`${c.client} solicitou orçamento para ${c.destination}.`,charterId:c.id}))}
+function syncReservationNotifications(){const seenKey='cltur_people_seen_v1';let seen=[];try{seen=JSON.parse(localStorage.getItem(seenKey)||'[]')}catch(e){seen=[]}if(!localStorage.getItem(seenKey)){localStorage.setItem(seenKey,JSON.stringify(data.people.map(p=>p.id)));return}const seenSet=new Set(seen);data.people.filter(p=>!seenSet.has(p.id)).forEach(p=>addNotification({key:'reservation:'+p.id,kind:'reservation',title:'Nova reserva de excursão',text:`${p.name} foi cadastrado(a) na excursão ${tripName(p.tripId)}.`,tripId:p.tripId,personId:p.id}));localStorage.setItem(seenKey,JSON.stringify(data.people.map(p=>p.id)))}
+function updateNotificationBadge(){const unread=getNotifications().filter(n=>!n.read),count=unread.length;const e=document.getElementById('notificationCount');if(e)e.textContent=count;const dot=document.getElementById('dashboardNotificationDot');if(dot)dot.classList.toggle('show',count>0);const alert=document.getElementById('dashboardNotificationAlert');if(alert){if(count){const latest=unread[0];alert.innerHTML=`<div class="notification-alert"><div class="left"><span class="bell">🔔</span><div><h3>${count===1?'Você tem 1 nova notificação':`Você tem ${count} novas notificações`}</h3><p>${esc(latest.title)}${latest.text?' · '+esc(latest.text):''}</p></div></div><button class="btn" onclick="openNotifications()">Ver notificações</button></div>`}else alert.innerHTML=''}}
+function openNotifications(){const list=getNotifications();openModal(`<h2>🔔 Notificações</h2><p class="muted">Pedidos recebidos e atividades recentes.</p><div class="notification-list">${list.length?list.map(n=>`<div class="notification-item ${n.read?'read':''}" onclick="notificationOpen('${n.id}')"><div class="notification-icon">${n.kind==='freight'?'🚐':n.kind==='reservation'?'🚌':'🔔'}</div><div><b>${esc(n.title)}</b><p>${esc(n.text||'')}</p><small>${new Date(n.createdAt).toLocaleString('pt-BR')}</small></div>${n.read?'':'<span class="new-dot"></span>'}</div>`).join(''):'<div class="empty">Nenhuma notificação.</div>'}</div><div class="actions"><button class="btn secondary" onclick="markNotificationsRead()">Marcar todas como lidas</button><button class="btn" onclick="closeModal()">Fechar</button></div>`)}
+function markNotificationsRead(){localStorage.setItem('cltur_notifications_v1',JSON.stringify(getNotifications().map(n=>({...n,read:true}))));updateNotificationBadge();closeModal()}
+function notificationOpen(id){const list=getNotifications(),n=list.find(x=>x.id==id);if(!n)return;n.read=true;localStorage.setItem('cltur_notifications_v1',JSON.stringify(list));updateNotificationBadge();closeModal();if(n.charterId){render('charters');setTimeout(()=>charterDetail(n.charterId),80)}else if(n.tripId){render('people');setTimeout(()=>peopleDetail(n.tripId),80)}}
+syncFreightNotifications();syncReservationNotifications();updateNotificationBadge()
+
+function refreshNotificationsFromStorage(){
+  syncFreightNotifications();
+  syncReservationNotifications();
+  updateNotificationBadge();
+}
+window.addEventListener('storage',function(e){
+  if(e.key==='cltur_notifications_v1' || e.key===KEY){
+    refreshNotificationsFromStorage();
+  }
+});
+setInterval(refreshNotificationsFromStorage,1000);
+// Renderiza o Dashboard somente após o DOM estar pronto.
+// Há uma segunda tentativa curta como proteção contra carregamento/atualização do navegador.
+function initCLTUR(){
+  // Garante que as coleções estejam normalizadas antes do primeiro render.
+  if(!Array.isArray(data.trips)) data.trips=[];
+  if(!Array.isArray(data.people)) data.people=[];
+  if(!Array.isArray(data.charters)) data.charters=[];
+  if(!Array.isArray(data.expenses)) data.expenses=[];
+  if(!Array.isArray(data.payments)) data.payments=[];
+  const paint=()=>{
+    try { render('dashboard'); }
+    catch(err) {
+      console.error('Falha ao carregar Dashboard:', err);
+      // Mantém uma mensagem visível em vez de deixar a tela completamente vazia.
+      main.innerHTML='<div class="panel" style="margin:24px"><h2>Dashboard</h2><p class="muted">Não foi possível carregar o painel. Recarregando os dados…</p></div>';
+      setTimeout(()=>{ try { render('dashboard'); } catch(e) { console.error('Falha no segundo carregamento:', e); } }, 100);
+    }
+  };
+  if(typeof queueMicrotask==='function') queueMicrotask(paint); else setTimeout(paint,0);
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', initCLTUR, {once:true});
+else initCLTUR();
+</script></body></html>
