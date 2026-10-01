@@ -17,8 +17,9 @@
     function hideLogin(){screen.style.display='none';logout.style.display='block';}
     async function checkAdmin(session){
       if(!session){showLogin();return false;}
-      const {data:profile,error}=await sb.rpc('cltur_get_my_profile');
+      const {data:profileData,error}=await sb.rpc('cltur_get_my_profile');
       if(error){console.error('CL TUR auth profile error:',error);showLogin('Não foi possível validar seu acesso. Verifique a configuração do Supabase.');return false;}
+      const profile=Array.isArray(profileData)?profileData[0]:profileData;
       if(!profile || profile.ativo!==true || profile.cargo!=='Administrador'){
         await sb.auth.signOut(); showLogin('Este usuário não possui acesso administrativo.'); return false;
       }
