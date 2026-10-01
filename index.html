@@ -11,10 +11,14 @@
     const logout=document.getElementById('cltur-logout');
     if(!sb || !screen || !form || !btn || !err || !logout) return;
     function showLogin(message){
+      screen.classList.remove('cltur-auth-hidden');
       screen.style.display='flex'; logout.style.display='none';
       if(message){err.textContent=message;err.style.display='block';}
     }
-    function hideLogin(){screen.style.display='none';logout.style.display='block';}
+    function hideLogin(){
+      screen.classList.add('cltur-auth-hidden');
+      screen.style.display='none'; logout.style.display='block';
+    }
     async function withTimeout(promise,ms,label){
       let timer;
       try{
