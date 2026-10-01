@@ -36,7 +36,10 @@
       btn.disabled=false;btn.textContent='Entrar';
     });
     logout.addEventListener('click',async()=>{await sb.auth.signOut();location.reload();});
-    sb.auth.onAuthStateChange(async(_event,session)=>{await checkAdmin(session);});
+    // Não fazemos chamadas ao banco dentro do callback de auth para evitar bloqueio do lock interno do Supabase.
+    sb.auth.onAuthStateChange((_event,session)=>{
+      if(!session) showLogin();
+    });
     window.CLTUR_AUTH_READY=checkAdmin;
     sb.auth.getSession().then(({data})=>checkAdmin(data.session));
   }
