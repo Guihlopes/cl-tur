@@ -484,6 +484,39 @@ table.table { width: 100%; }
 .dashboard-report-general, .dashboard-trip-result { display:none !important; }
 </style>
 
+
+<style id="cltur-trip-cards-responsive">
+.trips-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.trips-toolbar h2{margin:0 0 4px}
+.trips-mobile-list{display:none}
+.trip-mobile-card{background:#fff;border:1px solid #e1e7f0;border-radius:14px;padding:13px;margin:0 0 10px;box-shadow:0 4px 14px rgba(15,23,42,.045);min-width:0}
+.trip-mobile-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding-bottom:10px;border-bottom:1px solid #edf1f6}
+.trip-mobile-head h3{font-size:16px;line-height:1.2;margin:0 0 4px;overflow-wrap:anywhere}
+.trip-mobile-head p{font-size:12px;color:#667085;margin:0}
+.trip-mobile-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:11px 0}
+.trip-mobile-grid div{min-width:0;display:flex;flex-direction:column;gap:4px}
+.trip-mobile-grid small{font-size:10px;color:#667085}
+.trip-mobile-grid b{font-size:12px;line-height:1.3;overflow-wrap:anywhere}
+.trip-mobile-actions{border-top:1px solid #edf1f6;padding-top:9px}
+.trip-mobile-actions summary{font-size:12px;color:#0b5cff;font-weight:800;cursor:pointer;list-style:none}
+.trip-mobile-actions summary::-webkit-details-marker{display:none}
+.trip-mobile-actions summary:after{content:"＋";float:right}
+.trip-mobile-actions[open] summary:after{content:"−"}
+.trip-mobile-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding-top:9px}
+.trip-mobile-buttons .btn{min-width:0;white-space:normal;line-height:1.2;padding:8px 6px!important;font-size:11px!important}
+@media(max-width:760px){
+  .trips-toolbar{padding:11px!important}
+  .trips-toolbar .btn{flex:0 0 auto}
+  .trips-desktop-list{display:none!important}
+  .trips-mobile-list{display:block!important}
+}
+@media(max-width:390px){
+  .trip-mobile-card{padding:10px}
+  .trip-mobile-grid{gap:8px}
+  .trip-mobile-grid b{font-size:11px}
+}
+</style>
+
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
@@ -704,7 +737,37 @@ function dashboard(){
     </div>
   `);
 }
-function trips(){main.innerHTML=layout('Excursões',`<div class="panel"><button class="btn" onclick="tripForm()">+ Nova excursão</button></div><div class="panel"><table class="table"><tr><th>Destino</th><th>Data</th><th>Veículos</th><th>Preço</th><th>Vagas</th><th>Status</th><th></th></tr>${data.trips.map(t=>`<tr><td><b>${esc(t.destination)}</b><br><small>${esc(t.origin)}</small></td><td>${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''}</td><td>${(t.vehicles||[]).map(v=>v.type+' · '+v.seats).join('<br>')}</td><td>${money(t.price)}</td><td>${totalSeats(t)-occupied(t.id)} / ${totalSeats(t)}</td><td><span class="pill ${t.published?'ok':''}">${t.published?'Publicado':'Privado'}</span></td><td><div class="action-buttons"><button class="btn secondary" onclick="tripForm('${t.id}')">Editar</button><button class="btn secondary" onclick="seatMap('${t.id}')">💺 Assentos</button><button class="btn secondary" onclick="tripFinance('${t.id}')">💰 Financeiro</button><button class="btn secondary" onclick="tripRoute('${t.id}')">📲 Roteiro</button><button class="btn danger" onclick="delTrip('${t.id}')">Excluir</button></div></td></tr>`).join('')}</table></div>`)}
+function trips(){
+  const rows=data.trips.map(t=>`<tr>
+    <td><b>${esc(t.destination)}</b><br><small>${esc(t.origin||'')}</small></td>
+    <td>${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''}</td>
+    <td>${(t.vehicles||[]).map(v=>esc(v.type)+' · '+v.seats).join('<br>')}</td>
+    <td>${money(t.price)}</td>
+    <td>${Math.max(0,totalSeats(t)-occupied(t.id))} / ${totalSeats(t)}</td>
+    <td><span class="pill ${t.published?'ok':''}">${t.published?'Publicado':'Privado'}</span></td>
+    <td><div class="action-buttons"><button class="btn secondary" onclick="tripForm('${t.id}')">Editar</button><button class="btn secondary" onclick="seatMap('${t.id}')">💺 Assentos</button><button class="btn secondary" onclick="tripFinance('${t.id}')">💰 Financeiro</button><button class="btn secondary" onclick="tripRoute('${t.id}')">📲 Roteiro</button><button class="btn danger" onclick="delTrip('${t.id}')">Excluir</button></div></td>
+  </tr>`).join('');
+  const mobileCards=data.trips.map(t=>`<article class="trip-mobile-card">
+    <div class="trip-mobile-head"><div><h3>${esc(t.destination)}</h3><p>${esc(t.origin||'Origem a confirmar')}</p></div><span class="pill ${t.published?'ok':''}">${t.published?'Publicado':'Privado'}</span></div>
+    <div class="trip-mobile-grid">
+      <div><small>Saída / retorno</small><b>${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''}</b></div>
+      <div><small>Veículo(s)</small><b>${(t.vehicles||[]).map(v=>esc(v.type)+' · '+v.seats).join(' + ')||'A definir'}</b></div>
+      <div><small>Preço por pessoa</small><b>${money(t.price)}</b></div>
+      <div><small>Vagas disponíveis</small><b>${Math.max(0,totalSeats(t)-occupied(t.id))} de ${totalSeats(t)}</b></div>
+    </div>
+    <details class="trip-mobile-actions"><summary>Ações da excursão</summary><div class="trip-mobile-buttons">
+      <button class="btn secondary" onclick="tripForm('${t.id}')">✏️ Editar</button>
+      <button class="btn secondary" onclick="seatMap('${t.id}')">💺 Assentos</button>
+      <button class="btn secondary" onclick="tripFinance('${t.id}')">💰 Financeiro</button>
+      <button class="btn secondary" onclick="tripRoute('${t.id}')">📲 Roteiro</button>
+      <button class="btn danger" onclick="delTrip('${t.id}')">🗑️ Excluir</button>
+    </div></details>
+  </article>`).join('');
+  main.innerHTML=layout('Excursões',`
+    <div class="panel trips-toolbar"><div><h2>Suas excursões</h2><p class="muted">${data.trips.length} cadastrada${data.trips.length===1?'':'s'}</p></div><button class="btn" onclick="tripForm()">+ Nova excursão</button></div>
+    <div class="panel trips-desktop-list"><table class="table"><tr><th>Destino</th><th>Data</th><th>Veículos</th><th>Preço</th><th>Vagas</th><th>Status</th><th>Ações</th></tr>${rows||'<tr><td colspan="7"><div class="empty">Nenhuma excursão cadastrada.</div></td></tr>'}</table></div>
+    <div class="trips-mobile-list">${mobileCards||'<div class="panel empty">Nenhuma excursão cadastrada.</div>'}</div>`);
+}
 function vehicleOptions(selected){return ['Van','Ônibus'].map(x=>`<option ${selected===x?'selected':''}>${x}</option>`).join('')}
 function tripForm(id){let t=data.trips.find(x=>x.id==id)||{destination:'',origin:'',departure:'',returnDate:'',time:'',price:'',costs:'',notes:'',routeMessage:'',published:true,image:'',vehicles:[{type:'Van',seats:16}],childRuleEnabled:false,childFreeTransportAge:'',childExtraPrice:0};let vehicles=t.vehicles?.length?t.vehicles:[{type:'Van',seats:16}];openModal(`<h2>${id?'Editar':'Nova'} excursão</h2><form onsubmit="saveTrip(event,'${id||''}')"><div class="formgrid"><div class="field"><label>Destino</label><input name="destination" value="${esc(t.destination)}" required></div><div class="field"><label>Origem</label><input name="origin" value="${esc(t.origin)}"></div><div class="field"><label>Data de saída</label><input type="date" name="departure" value="${t.departure}" required></div><div class="field"><label>Data de retorno</label><input type="date" name="returnDate" value="${t.returnDate||''}"></div><div class="field"><label>Horário</label><input type="time" name="time" value="${t.time||''}"></div><div class="field"><label>Preço por pessoa</label><input type="number" step="0.01" name="price" value="${t.price||''}"></div><div class="field"><label>Custos previstos</label><input type="number" step="0.01" name="costs" value="${t.costs||''}"></div><div class="field"><label>Publicar na área do cliente</label><select name="published"><option value="1" ${t.published?'selected':''}>Sim</option><option value="0" ${!t.published?'selected':''}>Não</option></select></div><div class="field full"><label>📝 Descrição completa da excursão</label><textarea name="notes" rows="8" placeholder="Escreva aqui o texto comercial da viagem: roteiro, valores, o que está incluso, formas de pagamento, condições, etc.">${esc(t.notes)}</textarea><small class="muted" style="display:block;margin-top:7px">Esse texto aparece na área do cliente para apresentar a excursão.</small></div><div class="field full"><label>📋 Roteiro e orientações aos passageiros</label><textarea name="routeMessage" rows="12" placeholder="Ex.: pontos de embarque, horários, tolerância, parada para café, documentos, regras e demais orientações da viagem.">${esc(t.routeMessage||'')}</textarea><small class="muted" style="display:block;margin-top:7px">Mensagem específica desta excursão. Depois, use o botão 📲 Roteiro na lista de excursões para enviar aos passageiros cadastrados nesta viagem.</small></div><div class="field full"><label>👶 Regra especial para crianças</label><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:12px;border:1px solid #dbe2ea;border-radius:10px;background:#f8fafc"><label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700"><input type="checkbox" name="childRuleEnabled" ${t.childRuleEnabled?'checked':''}> Esta excursão possui regra especial</label><div class="field"><label>Até quantos anos?</label><input type="number" min="0" max="17" step="1" name="childFreeTransportAge" value="${t.childFreeTransportAge??''}" placeholder="Ex.: 6"></div><div class="field"><label>Valor de hospedagem/outros (R$)</label><input type="number" min="0" step="0.01" name="childExtraPrice" value="${Number(t.childExtraPrice||0)||''}" placeholder="Ex.: 100,00"></div></div><small class="muted" style="display:block;margin-top:7px">Até a idade informada, a criança não paga o transporte e não ocupa poltrona. Se houver hospedagem ou outro custo, informe o valor acima; o sistema calculará automaticamente ao receber a data de nascimento.</small></div><div class="field excursion-image-field"><label>Imagem/arte da excursão</label><div class="excursion-image-preview">${t.image?`<img src="${t.image}" alt="Arte da excursão">`:'<div style="font-size:42px">🖼️</div>'}<div style="flex:1"><input type="file" name="image" accept="image/*"><small class="muted" style="display:block;margin-top:7px">Envie a arte da viagem. Ela aparecerá em destaque quando o cliente abrir a excursão.</small>${t.image?'<label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px"><input type="checkbox" name="removeImage"> Remover imagem atual</label>':''}</div></div></div></div><hr><h3>Veículos da excursão</h3><div class="choice"><label><input type="radio" name="vehicleMode" value="van" onchange="setVehicleMode('van')"> 1 Van</label><label><input type="radio" name="vehicleMode" value="bus" onchange="setVehicleMode('bus')"> 1 Ônibus</label><label><input type="radio" name="vehicleMode" value="mix" onchange="setVehicleMode('mix')"> Van + Ônibus</label><label><input type="radio" name="vehicleMode" value="2bus" onchange="setVehicleMode('2bus')"> 2 Ônibus</label></div><div id="vehicleFields"></div><div class="actions"><button type="button" class="btn secondary" onclick="closeModal()">Cancelar</button><button class="btn">Salvar excursão</button></div></form>`);let mode=vehicles.length===2?(vehicles.filter(v=>v.type==='Ônibus').length===2?'2bus':'mix'):(vehicles[0]?.type==='Ônibus'?'bus':'van');document.querySelector(`input[name=vehicleMode][value=${mode}]`).checked=true;setVehicleMode(mode,vehicles)}
 
