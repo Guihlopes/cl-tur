@@ -119,6 +119,8 @@
 #cltur-auth-btn{width:100%;margin-top:20px;padding:13px;border:0;border-radius:10px;background:#2563eb;color:#fff;font-weight:800;font-size:15px;cursor:pointer}
 #cltur-auth-btn:disabled{opacity:.65;cursor:wait}.cltur-auth-error{margin-top:14px;padding:10px 12px;border-radius:9px;background:#fef2f2;color:#b91c1c;font-size:13px;display:none}
 #cltur-logout{position:fixed;right:18px;bottom:18px;z-index:9000;border:0;border-radius:999px;background:#111827;color:#fff;padding:10px 15px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.16)}
+
+.portal-request-list{display:grid;gap:14px;margin-top:16px}.portal-request-card{border:1px solid var(--line,#e5e7eb);border-radius:14px;padding:16px;background:#fff}.portal-request-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}.portal-request-head h3{margin:7px 0 4px}.request-type{font-weight:800;color:#0f3d5e}.request-status{font-size:12px;font-weight:800;background:#fef3c7;color:#92400e;padding:6px 9px;border-radius:99px}.request-details{margin-top:14px;line-height:1.5;overflow-wrap:anywhere}.request-details p{margin:5px 0}.request-person{padding:10px;margin:8px 0;border-radius:9px;background:#f8fafc;border:1px solid #e2e8f0}.request-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.request-actions .btn{font-size:12px}.empty-state{padding:28px;text-align:center;color:#64748b}
 </style></style>
 <style>
 .excursion-image-field{grid-column:1/-1}.excursion-image-preview{display:flex;gap:16px;align-items:center;padding:14px;border:1px dashed #cbd5e1;border-radius:14px;background:#f8fafc}.excursion-image-preview img{width:150px;height:95px;object-fit:cover;border-radius:10px;border:1px solid #e2e8f0}.public-trip-card{overflow:hidden;padding:0!important;display:flex;flex-direction:column}.public-trip-cover{width:100%;height:180px;object-fit:cover;display:block;background:#eef4f8}.public-trip-card .public-trip-body{padding:18px}.public-trip-card .public-trip-meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.public-trip-card .public-trip-meta span{background:#eef5fa;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;color:#31506b}.public-trip-empty-cover{height:180px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#eaf4fa,#f8fafc);font-size:44px}.public-preview-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}.public-preview-head .muted{margin:4px 0 0}.trip-detail-image{width:100%;max-height:480px;object-fit:contain;border-radius:16px;background:#f3f6f9;border:1px solid #e5e7eb;display:block;margin-bottom:18px}.
@@ -701,7 +703,7 @@ table.table { width: 100%; }
 </style>
 
 </head><body>
-<div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
+<div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="requests">📥 Pedidos do portal</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
 <div id="cltur-auth-screen">
   <form class="cltur-auth-card" id="cltur-auth-form">
@@ -811,7 +813,39 @@ modal.addEventListener('click',e=>{if(e.target===modal)closeModal()})
 function layout(title,body,action=''){let dash=title==='Dashboard';return `<div class="top ${dash?'dashboard-head':''}"><div><div class="admin-eyebrow">CL TUR • Painel administrativo</div><h1>${title}</h1><p class="admin-subtitle">${dash?'Gerencie excursões, passageiros, fretamentos e financeiro em um só lugar.':'Controle e organize as operações da CL TUR.'}</p></div>${action}</div>${body}`}
 function render(page='dashboard'){
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
- if(page==='dashboard')dashboard(); if(page==='trips')trips(); if(page==='people')people(); if(page==='charters')charters(); if(page==='finance')finance(); if(page==='calendar')calendar(); if(page==='reports')reports(); if(page==='public')publicPage();
+ 
+async function portalRequests(){
+ const main=document.getElementById('main');
+ main.innerHTML=layout('Pedidos do portal','<div class="panel"><p class="muted">Carregando pedidos...</p></div>');
+ try{
+  const {data:items,error}=await window.clturSupabase.from('cltur_public_requests').select('id,tipo,dados,status,criado_em').order('criado_em',{ascending:false}).limit(200);
+  if(error)throw error;
+  const label=(v)=>v==null||v===''?'-':String(v);
+  const moneyReq=(v)=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const details=(r)=>{
+   const d=r.dados||{};
+   if(r.tipo==='reserva'){
+    const ps=Array.isArray(d.passageiros)?d.passageiros:[];
+    return '<div class="request-details"><p><b>Excursão:</b> '+esc(label(d.excursao))+'</p><p><b>Data:</b> '+esc(fmt(d.data_viagem))+'</p><p><b>Origem:</b> '+esc(label(d.origem))+'</p><p><b>Quantidade:</b> '+ps.length+' passageiro(s)</p><p><b>Total informado:</b> '+esc(moneyReq(d.total))+'</p><h4>Dados dos passageiros</h4>'+ps.map((p,i)=>'<div class="request-person"><b>Passageiro '+(i+1)+': '+esc(label(p.nome))+'</b><br>Nascimento: '+esc(fmt(p.nascimento))+' · CPF: '+esc(label(p.cpf))+' · RG: '+esc(label(p.rg))+'<br>Telefone: '+esc(label(p.telefone))+'<br>Endereço: '+esc(label(p.endereco))+'<br>Assento: '+esc(label(p.assento))+'</div>').join('')+'</div>';
+   }
+   return '<div class="request-details"><p><b>Solicitante:</b> '+esc(label(d.nome))+'</p><p><b>Telefone:</b> '+esc(label(d.telefone))+'</p><p><b>Saída:</b> '+esc(label(d.origem))+' · '+esc(fmt(d.data_saida))+' '+esc(label(d.hora_saida))+'</p><p><b>Destino:</b> '+esc(label(d.destino))+'</p><p><b>Retorno:</b> '+esc(fmt(d.data_retorno))+' '+esc(label(d.hora_retorno))+'</p><p><b>Passageiros:</b> '+esc(label(d.passageiros))+' · <b>Veículo:</b> '+esc(label(d.veiculo))+'</p><p><b>Observações:</b> '+esc(label(d.observacoes))+'</p></div>';
+  };
+  main.innerHTML=layout('Pedidos do portal','<div class="panel"><div class="section-head"><div><h2>Solicitações recebidas</h2><p class="muted">Os dados ficam visíveis somente para administradores autorizados.</p></div><button class="btn secondary" onclick="portalRequests()">↻ Atualizar</button></div>'+
+   (items&&items.length?'<div class="portal-request-list">'+items.map(r=>'<article class="portal-request-card"><div class="portal-request-head"><div><span class="request-type">'+(r.tipo==='reserva'?'🎫 Reserva':'🚐 Orçamento')+'</span><h3>'+esc((r.dados||{}).excursao||(r.dados||{}).destino||'Pedido do portal')+'</h3><small>'+esc(new Date(r.criado_em).toLocaleString('pt-BR'))+'</small></div><span class="request-status">'+esc(r.status)+'</span></div>'+details(r)+'<div class="request-actions"><button class="btn secondary" onclick="updatePortalRequestStatus(\''+r.id+'\',\'Em atendimento\')">Em atendimento</button><button class="btn primary" onclick="updatePortalRequestStatus(\''+r.id+'\',\'Concluído\')">Concluir</button><button class="btn danger" onclick="updatePortalRequestStatus(\''+r.id+'\',\'Cancelado\')">Cancelar</button></div></article>').join('')+'</div>':'<div class="empty-state"><h3>Nenhum pedido recebido ainda</h3><p>Quando um cliente enviar uma reserva ou pedir orçamento pelo portal integrado, aparecerá aqui.</p></div>')+'</div>');
+ }catch(error){
+  console.error('Erro ao carregar pedidos do portal:',error);
+  main.innerHTML=layout('Pedidos do portal','<div class="panel"><h3>Não foi possível carregar os pedidos</h3><p class="muted">'+esc(error.message||'Verifique a conexão e as permissões da tabela cltur_public_requests.')+'</p><button class="btn secondary" onclick="portalRequests()">Tentar novamente</button></div>');
+ }
+}
+async function updatePortalRequestStatus(id,status){
+ try{
+  const {error}=await window.clturSupabase.from('cltur_public_requests').update({status}).eq('id',id);
+  if(error)throw error;
+  portalRequests();
+ }catch(error){alert('Não foi possível atualizar o pedido: '+(error.message||'erro desconhecido'))}
+}
+
+if(page==='dashboard')dashboard(); if(page==='trips')trips(); if(page==='people')people(); if(page==='charters')charters(); if(page==='finance')finance(); if(page==='calendar')calendar(); if(page==='reports')reports(); if(page==='public')publicPage(); if(page==='requests')portalRequests();
 }
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>render(b.dataset.page));
 if(Array.isArray(data.charters)){let changed=false;data.charters.forEach(c=>{if(['Orçamento solicitado','Orçamento'].includes(c.status) && !Number(c.value||0)){c.status='Aguardando fechamento';changed=true}});if(changed)localStorage.setItem(KEY,JSON.stringify(data))}
