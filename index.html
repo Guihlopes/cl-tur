@@ -613,6 +613,93 @@ table.table { width: 100%; }
 }
 </style>
 
+
+<style id="cltur-calendar-compact-month-grid">
+@media (max-width: 760px) {
+  .calendar-panel { padding: 10px !important; overflow: hidden !important; }
+  .calendar-head { display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:7px !important; }
+  .calendar-head h2 { font-size:16px !important; margin:2px 0 !important; }
+  .calendar-head p { font-size:10px !important; margin:3px 0 !important; }
+  .calendar-controls {
+    display:grid !important; grid-template-columns:34px minmax(45px,1fr) 34px minmax(0,1.4fr) 62px !important;
+    gap:4px !important; width:100% !important; align-items:center !important;
+  }
+  .calendar-controls .btn { min-width:0 !important; width:100% !important; padding:6px 2px !important; min-height:32px !important; font-size:11px !important; }
+  .calendar-controls select,.calendar-controls input {
+    grid-column:auto !important; grid-row:auto !important; min-width:0 !important; width:100% !important;
+    height:32px !important; min-height:32px !important; padding:4px 5px !important; font-size:11px !important;
+  }
+  .calendar-legend { display:flex !important; flex-wrap:wrap !important; gap:4px 9px !important; margin:7px 0 !important; font-size:10px !important; }
+  .calendar-weekdays {
+    display:grid !important; grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+    gap:3px !important; margin:6px 0 3px !important;
+  }
+  .calendar-weekdays > div { text-align:center !important; font-size:10px !important; padding:3px 0 !important; }
+  .calendar-grid {
+    min-width:0 !important; width:100% !important;
+    display:grid !important; grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+    gap:3px !important;
+  }
+  .cal-day {
+    display:flex !important; flex-direction:column !important; align-items:stretch !important;
+    min-width:0 !important; min-height:44px !important; height:44px !important;
+    padding:3px !important; gap:2px !important; border-radius:6px !important;
+    overflow:hidden !important;
+  }
+  .cal-num { font-size:10px !important; line-height:1.1 !important; margin:0 !important; }
+  .cal-event {
+    display:block !important; width:100% !important; min-width:0 !important;
+    padding:2px 1px !important; margin:0 !important; border-radius:3px !important;
+    font-size:7px !important; line-height:1.05 !important; white-space:nowrap !important;
+    overflow:hidden !important; text-overflow:ellipsis !important;
+  }
+  .cal-more { display:none !important; }
+}
+@media (max-width: 390px) {
+  .calendar-panel { padding:7px !important; }
+  .calendar-controls { grid-template-columns:28px minmax(35px,1fr) 28px minmax(0,1.3fr) 54px !important; gap:3px !important; }
+  .calendar-controls .btn { font-size:10px !important; }
+  .calendar-controls select,.calendar-controls input { font-size:10px !important; }
+  .calendar-weekdays { gap:2px !important; }
+  .calendar-weekdays > div { font-size:9px !important; }
+  .calendar-grid { gap:2px !important; }
+  .cal-day { height:39px !important; min-height:39px !important; padding:2px !important; }
+  .cal-num { font-size:9px !important; }
+  .cal-event { font-size:6px !important; }
+}
+</style>
+
+
+<style id="cltur-dashboard-home-clean">
+@media (max-width: 760px) {
+  .final-hero { padding:12px !important; gap:8px !important; align-items:flex-start !important; }
+  .final-hero h2 { font-size:17px !important; margin:0 0 4px !important; }
+  .final-hero p { font-size:11px !important; margin:0 !important; }
+  .dashboard-bell { font-size:11px !important; padding:7px 8px !important; }
+  #dashboardNotificationAlert:empty { display:none !important; }
+  #dashboardNotificationAlert { margin-bottom:7px !important; }
+  .main > .cards { gap:7px !important; margin-bottom:8px !important; }
+  .main > .cards .card { padding:9px !important; }
+  .main > .cards .card strong { font-size:16px !important; }
+  .main > .panel { padding:10px !important; margin-bottom:8px !important; }
+  .main > .panel .section-heading h2 { font-size:15px !important; }
+  .main > .panel .section-heading p { font-size:10px !important; }
+  .main > .panel .section-heading { gap:7px !important; }
+  .main > .panel .section-heading .btn { font-size:11px !important; padding:7px 9px !important; }
+  .dashboard-upcoming-desktop { display:none !important; }
+  .main > .panel table.table { display:none !important; }
+  .main > .panel .dashboard-upcoming-mobile { display:grid !important; gap:7px !important; }
+  .dashboard-upcoming-card { padding:9px !important; border:1px solid #e5eaf2 !important; border-radius:10px !important; background:#f8fafc !important; }
+  .dashboard-upcoming-card h3 { margin:0 0 3px !important; font-size:13px !important; }
+  .dashboard-upcoming-card p { margin:0 0 6px !important; font-size:10px !important; color:#667085 !important; }
+  .dashboard-upcoming-meta { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:5px !important; font-size:10px !important; }
+  .dashboard-upcoming-actions { display:flex !important; flex-wrap:wrap !important; gap:5px !important; margin-top:7px !important; }
+  .dashboard-upcoming-actions .btn { font-size:10px !important; padding:6px 7px !important; }
+  .main > .cards:last-child .panel h2 { font-size:14px !important; }
+  .main > .cards:last-child .panel p { font-size:10px !important; }
+}
+</style>
+
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
@@ -795,36 +882,10 @@ function dashboard(){
 
     <div class="panel">
       <div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <div><h2>📊 Relatório geral</h2><p class="muted">Resumo financeiro consolidado de excursões e fretamentos.</p></div>
-        <button class="btn secondary" onclick="render('finance')">Abrir financeiro completo</button>
-      </div>
-      <div class="cards">
-        <div class="card"><small>Receita contratada</small><strong>${money(totalRevenue)}</strong><p class="muted">Excursões + fretamentos</p></div>
-        <div class="card"><small>Total recebido</small><strong>${money(totalReceived)}</strong><p class="muted">Valores já registrados</p></div>
-        <div class="card"><small>Total a receber</small><strong>${money(pending)}</strong><p class="muted">Saldos em aberto</p></div>
-        <div class="card"><small>Custos realizados</small><strong>${money(expenses)}</strong><p class="muted">Despesas lançadas</p></div>
-        <div class="card"><small>Resultado atual</small><strong class="${currentResult>=0?'result-positive':'result-negative'}">${money(currentResult)}</strong><p class="muted">Recebido − custos</p></div>
-        <div class="card"><small>Resultado projetado</small><strong class="${projected>=0?'result-positive':'result-negative'}">${money(projected)}</strong><p class="muted">Considerando receitas e custos previstos</p></div>
-      </div>
-      <div class="report-summary-strip">
-        <div><span>Excursões</span><b>${data.trips.length}</b></div>
-        <div><span>Fretamentos</span><b>${data.charters.length}</b></div>
-        <div><span>Publicadas</span><b>${data.trips.filter(t=>t.published).length}</b></div>
-        <div><span>Fretamentos em aberto</span><b>${openCharters}</b></div>
-        <div><span>Pagamentos pendentes</span><b>${pendingPeople}</b></div>
-      </div>
-      ${tripReport||charterReport?`<div class="report-tables">
-        ${tripReport?`<div><h3>Resultado por excursão</h3><div style="overflow:auto"><table class="table"><tr><th>Operação</th><th>Contratado</th><th>Recebido</th><th>A receber</th><th>Custos</th><th>Resultado</th></tr>${tripReport}</table></div></div>`:''}
-        ${charterReport?`<div style="margin-top:22px"><h3>Resultado por fretamento</h3><div style="overflow:auto"><table class="table"><tr><th>Operação</th><th>Contratado</th><th>Recebido</th><th>A receber</th><th>Custos</th><th>Resultado</th></tr>${charterReport}</table></div></div>`:''}
-      </div>`:'<div class="empty">Ainda não há operações financeiras cadastradas.</div>'}
-    </div>
-
-    <div class="panel">
-      <div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
         <div><h2>Próximas excursões</h2><p class="muted">Acompanhe ocupação, veículos e ações rápidas.</p></div>
         <button class="btn" onclick="tripForm()">+ Nova excursão</button>
       </div>
-      ${nextRows?`<div style="overflow:auto"><table class="table"><tr><th>Destino</th><th>Saída</th><th>Veículos</th><th>Vagas</th><th></th></tr>${nextRows}</table></div>`:'<div class="empty">Nenhuma excursão futura cadastrada.</div>'}
+      ${upcoming.length?`<div class="dashboard-upcoming-mobile" style="display:none">${upcoming.slice(0,6).map(t=>{const total=totalSeats(t),occ=occupied(t.id),free=Math.max(0,total-occ),pct=total?Math.round(occ/total*100):0;return `<article class="dashboard-upcoming-card"><h3>${esc(t.destination)}</h3><p>${esc(t.origin||'Origem a confirmar')}</p><div class="dashboard-upcoming-meta"><span>📅 ${fmt(t.departure)}${t.time?' · '+esc(t.time):''}</span><span>🚌 ${(t.vehicles||[]).map(v=>esc(v.type)+' ('+v.seats+')').join(' + ')||'A definir'}</span><span>🪑 ${free} de ${total} vagas</span><span>📊 ${pct}% ocupados</span></div><div class="dashboard-upcoming-actions"><button class="btn secondary" onclick="tripFinance('${t.id}')">💰 Financeiro</button><button class="btn secondary" onclick="seatMap('${t.id}')">💺 Assentos</button></div></article>`}).join('')}</div><div class="dashboard-upcoming-desktop" style="overflow:auto"><table class="table"><tr><th>Destino</th><th>Saída</th><th>Veículos</th><th>Vagas</th><th></th></tr>${nextRows}</table></div>`:'<div class="empty">Nenhuma excursão futura cadastrada.</div>'}
     </div>
 
     <div class="cards">
