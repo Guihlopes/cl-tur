@@ -40,7 +40,7 @@
           showLogin('Seu usuário entrou, mas o perfil administrativo não foi reconhecido.');
           return false;
         }
-        hideLogin(); return true;
+        hideLogin(); window.dispatchEvent(new Event('cltur-admin-ready')); return true;
       }catch(error){
         console.error('CL TUR auth error:',error);
         const detail=error?.message||error?.details||'Erro desconhecido';
@@ -80,8 +80,8 @@
 </script>
 <script>
   // Configuração pública do Supabase. A Publishable Key pode ficar no frontend.
-  window.CLTUR_SUPABASE_URL = 'https://vucunqfaeukskvurdvog.supabase.co';
-  window.CLTUR_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_FNIkVNyIQ5VTiAjTditVRg_KsUj3nAq';
+  window.CLTUR_SUPABASE_URL = 'https://btupvhbrnwxcpjwgvsls.supabase.co';
+  window.CLTUR_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_BD6LSdQagrF1MiNByhqqwQ_cxHBSdJm';
   window.clturSupabase = window.supabase.createClient(
     window.CLTUR_SUPABASE_URL,
     window.CLTUR_SUPABASE_PUBLISHABLE_KEY
@@ -343,7 +343,68 @@ function paymentTotal(p){let arr=passengerPayments(p.id);return arr.length?arr.r
 function paymentStatus(p){let paid=paymentTotal(p), value=Number(p.value||0);if(value>0&&paid>=value)return 'Confirmado';if(paid>0)return 'Parcial';return p.status==='Cancelado'?'Cancelado':'Pendente'}
 function paymentMethodLabel(m){return m==='Pix'?'📲 Pix':m==='Cartão'?'💳 Cartão':m==='Dinheiro'?'💵 Dinheiro':'🏦 Transferência'}
 
-function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+let clturCloudReady=false;
+let clturCloudSaveTimer=null;
+let clturCloudLoading=false;
+function normalizeCLTURData(value){
+  const d=(value && typeof value==='object')?value:{};
+  if(!Array.isArray(d.trips))d.trips=[];
+  if(!Array.isArray(d.people))d.people=[];
+  if(!Array.isArray(d.charters))d.charters=[];
+  if(!Array.isArray(d.expenses))d.expenses=[];
+  if(!Array.isArray(d.payments))d.payments=[];
+  return d;
+}
+async function loadCLTURCloudState(){
+  if(clturCloudLoading)return;
+  clturCloudLoading=true;
+  clturCloudReady=false;
+  try{
+    const {data:row,error}=await window.clturSupabase
+      .from('cltur_app_state').select('state').eq('id','main').maybeSingle();
+    if(error)throw error;
+    // Projeto novo: se ainda não há registro, começa vazio e NÃO importa dados antigos do navegador.
+    data=normalizeCLTURData(row?.state||{});
+    localStorage.setItem(KEY,JSON.stringify(data));
+    clturCloudReady=true;
+    render('dashboard');
+    console.info('CL TUR: dados carregados do Supabase.');
+  }catch(error){
+    console.error('Falha ao carregar dados do Supabase:',error);
+    const msg=error?.message||'Erro desconhecido';
+    if(main)main.innerHTML='<div class="panel"><h2>Não foi possível carregar os dados</h2><p class="muted">Confira a tabela cltur_app_state e as políticas RLS no Supabase. Detalhe: '+esc(msg)+'</p><button class="btn" onclick="loadCLTURCloudState()">Tentar novamente</button></div>';
+  }finally{clturCloudLoading=false;}
+}
+async function saveCLTURCloudState(){
+  if(!clturCloudReady)return;
+  try{
+    const {error}=await window.clturSupabase.from('cltur_app_state').upsert({
+      id:'main',state:data,updated_at:new Date().toISOString()
+    },{onConflict:'id'});
+    if(error)throw error;
+    console.info('CL TUR: dados sincronizados com o Supabase.');
+  }catch(error){
+    console.error('Falha ao sincronizar com o Supabase:',error);
+    const detail=error?.message||'Erro desconhecido';
+    let status=document.getElementById('cltur-cloud-status');
+    if(!status){
+      status=document.createElement('div');status.id='cltur-cloud-status';
+      status.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99998;background:#991b1b;color:white;padding:10px 14px;border-radius:10px;font:13px Arial;max-width:min(420px,90vw)';
+      document.body.appendChild(status);
+    }
+    status.textContent='Atenção: não foi possível sincronizar com a nuvem. '+detail;
+  }
+}
+function save(){
+  data=normalizeCLTURData(data);
+  localStorage.setItem(KEY,JSON.stringify(data));
+  render();
+  if(clturCloudReady){
+    clearTimeout(clturCloudSaveTimer);
+    clturCloudSaveTimer=setTimeout(saveCLTURCloudState,350);
+  }
+}
+window.addEventListener('cltur-admin-ready',loadCLTURCloudState);
 function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function fmt(d){if(!d)return '-';let [y,m,day]=d.split('-');return `${day}/${m}/${y}`}
@@ -892,7 +953,10 @@ function initCLTUR(){
       setTimeout(()=>{ try { render('dashboard'); } catch(e) { console.error('Falha no segundo carregamento:', e); } }, 100);
     }
   };
-  if(typeof queueMicrotask==='function') queueMicrotask(paint); else setTimeout(paint,0);
+  // O conteúdo definitivo será renderizado após login e carregamento do Supabase.
+  if(!window.clturSupabase) {
+    if(typeof queueMicrotask==='function') queueMicrotask(paint); else setTimeout(paint,0);
+  }
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', initCLTUR, {once:true});
 else initCLTUR();
