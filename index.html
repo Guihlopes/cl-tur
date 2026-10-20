@@ -760,8 +760,8 @@ async function loadCLTURCloudState(){
     clturCloudReady=true;
     await syncPortalFreightRequests();
     syncFreightNotifications();
-    updateNotificationBadge();
     render('dashboard');
+    updateNotificationBadge();
     console.info('CL TUR: dados carregados do Supabase.');
   }catch(error){
     console.error('Falha ao carregar dados do Supabase:',error);
