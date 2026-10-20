@@ -407,6 +407,50 @@ table.table { width: 100%; }
 }
 </style>
 
+
+<style id="cltur-compact-mobile-v2">
+/* Layout mais compacto: reduz rolagem sem esconder conteúdo essencial */
+@media (max-width: 760px) {
+  .side { padding: 6px 8px 7px !important; }
+  .brand { padding: 2px 3px 6px !important; margin-bottom: 5px !important; }
+  .brand img { width: 32px !important; height: 32px !important; }
+  .brand b { font-size: 14px !important; }
+  .brand small { font-size: 10px !important; }
+  .nav { gap: 4px !important; padding: 1px 0 3px !important; }
+  .nav button { padding: 7px 9px !important; font-size: 11px !important; }
+  .main { padding: 8px !important; }
+  .top { padding: 11px 12px !important; gap: 7px !important; margin-bottom: 9px !important; border-radius: 12px !important; }
+  .top h1 { font-size: 19px !important; }
+  .admin-subtitle { font-size: 11px !important; margin-top: 3px !important; }
+  .admin-eyebrow { font-size: 9px !important; }
+  .cards { gap: 7px !important; margin-bottom: 10px !important; }
+  .card { padding: 10px !important; border-radius: 11px !important; }
+  .card small { font-size: 10px !important; }
+  .card strong { font-size: 18px !important; margin-top: 4px !important; }
+  .panel { padding: 10px !important; margin-bottom: 9px !important; border-radius: 12px !important; }
+  .panel h2 { font-size: 15px !important; margin-bottom: 9px !important; }
+  .muted { font-size: 11px !important; }
+  .btn { padding: 8px 10px !important; font-size: 12px !important; border-radius: 9px !important; }
+  .field { gap: 4px !important; }
+  .field label { font-size: 11px !important; }
+  .field input, .field select, .field textarea, input, select, textarea { min-height: 36px !important; padding: 7px 9px !important; font-size: 13px !important; }
+  .formgrid { gap: 8px !important; }
+  .table th, .table td { padding: 7px 6px !important; font-size: 11px !important; }
+  .actions { margin-top: 10px !important; }
+  .modalbox { padding: 13px 11px 18px !important; }
+  .public-trip-cover, .public-trip-empty-cover { height: 130px !important; }
+  .public-trip-card .public-trip-body { padding: 11px !important; }
+}
+@media (max-width: 390px) {
+  .main { padding: 6px !important; }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .card { padding: 8px !important; }
+  .card strong { font-size: 16px !important; }
+  .nav button { font-size: 10px !important; padding: 7px 8px !important; }
+}
+/* Mantém os menus e formulários roláveis quando o conteúdo realmente exceder a tela. */
+</style>
+
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
