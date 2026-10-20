@@ -2,7 +2,7 @@
   "id": "./",
   "name": "CL TUR Transporte & Turismo",
   "short_name": "CL TUR",
-  "description": "Gestão de excursões, reservas e fretamentos da CL TUR.",
+  "description": "Aplicativo CL TUR com gestão de excursões, reservas e fretamentos.",
   "lang": "pt-BR",
   "start_url": "./",
   "scope": "./",

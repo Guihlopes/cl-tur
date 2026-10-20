@@ -451,6 +451,39 @@ table.table { width: 100%; }
 /* Mantém os menus e formulários roláveis quando o conteúdo realmente exceder a tela. */
 </style>
 
+
+<style id="cltur-drawer-navigation">
+#cltur-menu-toggle { display:none; }
+@media (max-width: 760px) {
+  #cltur-menu-toggle {
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; min-height:42px; border:1px solid rgba(255,255,255,.18);
+    border-radius:11px; color:#fff; background:rgba(255,255,255,.08);
+    font-size:14px; font-weight:800; cursor:pointer; margin:0 0 6px;
+  }
+  #cltur-menu-toggle .menu-chevron { margin-left:auto; transition:transform .18s ease; }
+  .side.cltur-menu-open #cltur-menu-toggle .menu-chevron { transform:rotate(180deg); }
+  .side .nav { display:none !important; }
+  .side.cltur-menu-open .nav {
+    display:flex !important; flex-direction:column !important; align-items:stretch !important;
+    overflow:visible !important; max-height:58vh; overflow-y:auto !important;
+    padding:4px 0 2px !important; gap:4px !important;
+  }
+  .side.cltur-menu-open .nav button {
+    width:100% !important; justify-content:flex-start !important; text-align:left !important;
+    border-radius:9px !important; padding:10px 12px !important; font-size:13px !important;
+  }
+  .side.cltur-menu-open .nav button:first-letter { font-size:inherit !important; }
+}
+</style>
+
+
+<style id="cltur-dashboard-cleanup">
+/* Hide only general report/route-result panels when they are rendered on the dashboard;
+   financial pages remain untouched. */
+.dashboard-report-general, .dashboard-trip-result { display:none !important; }
+</style>
+
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
@@ -1111,6 +1144,34 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+</script>
+
+
+<script id="cltur-drawer-menu-script">
+(function(){
+  function setupMenu(){
+    const side=document.querySelector('.side');
+    const nav=side&&side.querySelector('.nav');
+    if(!side||!nav||document.getElementById('cltur-menu-toggle'))return;
+    const btn=document.createElement('button');
+    btn.id='cltur-menu-toggle';btn.type='button';
+    btn.innerHTML='<span>☰</span><span>Menu de navegação</span><span class="menu-chevron">⌄</span>';
+    btn.setAttribute('aria-expanded','false');
+    btn.addEventListener('click',function(){
+      const open=side.classList.toggle('cltur-menu-open');
+      btn.setAttribute('aria-expanded',String(open));
+    });
+    side.insertBefore(btn,nav);
+    nav.addEventListener('click',function(e){
+      if(e.target.closest('button') && window.matchMedia('(max-width: 760px)').matches){
+        side.classList.remove('cltur-menu-open');btn.setAttribute('aria-expanded','false');
+      }
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupMenu,{once:true});
+  else setupMenu();
+  window.addEventListener('load',setupMenu);
+})();
 </script>
 
 </body></html>
