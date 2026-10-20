@@ -744,6 +744,7 @@ function normalizeCLTURData(value){
   if(!Array.isArray(d.charters))d.charters=[];
   if(!Array.isArray(d.expenses))d.expenses=[];
   if(!Array.isArray(d.payments))d.payments=[];
+  if(!Array.isArray(d.dismissedPortalRequestIds))d.dismissedPortalRequestIds=[];
   return d;
 }
 async function loadCLTURCloudState(){
@@ -769,16 +770,19 @@ async function loadCLTURCloudState(){
     if(main)main.innerHTML='<div class="panel"><h2>Não foi possível carregar os dados</h2><p class="muted">Confira a tabela cltur_app_state e as políticas RLS no Supabase. Detalhe: '+esc(msg)+'</p><button class="btn" onclick="loadCLTURCloudState()">Tentar novamente</button></div>';
   }finally{clturCloudLoading=false;}
 }
+let clturCloudSaveQueue=Promise.resolve();
 async function saveCLTURCloudState(){
   if(!clturCloudReady)return;
-  try{
+  clturCloudSaveQueue=clturCloudSaveQueue.then(async()=>{
+    if(!clturCloudReady)return;
+    const snapshot=JSON.parse(JSON.stringify(data));
     const {error}=await window.clturSupabase.from('cltur_app_state').upsert({
-      id:'main',state:data,updated_at:new Date().toISOString()
+      id:'main',state:snapshot,updated_at:new Date().toISOString()
     },{onConflict:'id'});
     if(error)throw error;
     console.info('CL TUR: dados sincronizados com o Supabase.');
-  }catch(error){
-    console.error('Falha ao sincronizar com o Supabase:',error);
+  }).catch(error=>{
+    console.error('Falha ao sincronizar com a nuvem:',error);
     const detail=error?.message||'Erro desconhecido';
     let status=document.getElementById('cltur-cloud-status');
     if(!status){
@@ -787,7 +791,8 @@ async function saveCLTURCloudState(){
       document.body.appendChild(status);
     }
     status.textContent='Atenção: não foi possível sincronizar com a nuvem. '+detail;
-  }
+  });
+  return clturCloudSaveQueue;
 }
 function save(){
   data=normalizeCLTURData(data);
@@ -825,7 +830,9 @@ async function syncPortalFreightRequests(){
   const byRequest=new Map(existing.filter(c=>c.portalRequestId).map(c=>[String(c.portalRequestId),c]));
   let changed=false;
   const incoming=[];
+  const dismissed=new Set((data.dismissedPortalRequestIds||[]).map(String));
   for(const r of (requests||[])){
+   if(dismissed.has(String(r.id)))continue;
    const d=r.dados||{};
    const old=byRequest.get(String(r.id));
    const id=old?.id||('portal-'+r.id);
@@ -1303,7 +1310,12 @@ function saveCharter(e,id){
   closeModal();save();render('charters');
 }
 function delCharter(id){
+  const target=data.charters.find(c=>c.id==id);
   if(confirm('Excluir este fretamento? Esta ação não poderá ser desfeita.')){
+    if(target?.portalRequestId){
+      if(!Array.isArray(data.dismissedPortalRequestIds))data.dismissedPortalRequestIds=[];
+      if(!data.dismissedPortalRequestIds.map(String).includes(String(target.portalRequestId)))data.dismissedPortalRequestIds.push(String(target.portalRequestId));
+    }
     data.charters=data.charters.filter(c=>c.id!=id);
     save();render('charters');
   }
