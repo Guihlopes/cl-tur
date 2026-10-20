@@ -1,5 +1,14 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="theme-color" content="#071a38">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CL TUR">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
 (function(){
   function initAuth(){
@@ -309,6 +318,95 @@ html,body{margin:0!important;width:100%!important;min-height:100%!important;over
 }
 #cltur-logout{z-index:2147483646!important}
 </style>
+
+<style id="cltur-mobile-app-layout">
+/* CL TUR mobile-first polish */
+html { -webkit-text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+button, input, select, textarea { max-width: 100%; }
+img { max-width: 100%; }
+.table-wrap { max-width: 100%; overflow-x: auto; }
+table.table { width: 100%; }
+@media (max-width: 760px) {
+  .app { display: block !important; min-height: 100vh; }
+  .side {
+    position: sticky !important; top: 0 !important; inset: auto !important;
+    width: 100% !important; height: auto !important; max-height: none !important;
+    padding: 8px 10px 10px !important; z-index: 500 !important;
+    display: block !important; overflow: visible !important;
+    box-shadow: 0 6px 18px rgba(7,26,56,.18) !important;
+  }
+  .brand {
+    display: flex !important; justify-content: flex-start !important;
+    gap: 10px !important; padding: 4px 4px 9px !important;
+    margin: 0 0 8px !important;
+  }
+  .brand div { display: block !important; min-width: 0; }
+  .brand img { width: 38px !important; height: 38px !important; flex: 0 0 auto; }
+  .brand b { font-size: 16px !important; }
+  .brand small { display: block !important; font-size: 11px !important; }
+  .nav {
+    display: flex !important; gap: 6px !important;
+    overflow-x: auto !important; overflow-y: hidden !important;
+    padding: 2px 0 5px !important; scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav button {
+    display: inline-flex !important; flex: 0 0 auto !important;
+    align-items: center !important; justify-content: center !important;
+    width: auto !important; min-width: max-content !important;
+    margin: 0 !important; padding: 9px 11px !important;
+    border-radius: 999px !important; font-size: 12px !important;
+    line-height: 1.25 !important; white-space: nowrap !important;
+    text-align: center !important; transform: none !important;
+  }
+  .nav button:first-letter { font-size: inherit !important; }
+  .main {
+    margin: 0 !important; width: 100% !important;
+    max-width: 100% !important; padding: 12px !important;
+  }
+  .top {
+    display: flex !important; align-items: flex-start !important;
+    flex-direction: column !important; gap: 12px !important;
+    padding: 16px !important; margin-bottom: 14px !important;
+    border-radius: 16px !important;
+  }
+  .top h1 { font-size: 22px !important; line-height: 1.2 !important; }
+  .top > * { max-width: 100%; }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+  .card { min-width: 0 !important; padding: 13px !important; border-radius: 14px !important; }
+  .card strong { font-size: 21px !important; overflow-wrap: anywhere; }
+  .panel { padding: 14px !important; margin-bottom: 13px !important; border-radius: 15px !important; }
+  .panel h2 { font-size: 17px !important; }
+  .formgrid { grid-template-columns: minmax(0, 1fr) !important; gap: 11px !important; }
+  .field.full { grid-column: auto !important; }
+  .vehicle-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .choice { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .table { display: block !important; max-width: 100% !important; overflow-x: auto !important; white-space: nowrap !important; -webkit-overflow-scrolling: touch; }
+  .table th, .table td { padding: 9px 8px !important; }
+  .actions, .action-buttons { flex-wrap: wrap !important; gap: 7px !important; }
+  .actions .btn, .action-buttons .btn { min-height: 40px; }
+  .modal { align-items: flex-end !important; padding: 0 !important; }
+  .modalbox {
+    width: 100% !important; max-width: 100% !important;
+    max-height: 92dvh !important; overflow-y: auto !important;
+    border-radius: 20px 20px 0 0 !important; padding: 18px 14px 24px !important;
+  }
+  #cltur-logout { right: 12px !important; bottom: 12px !important; padding: 10px 12px !important; }
+  .report-summary-strip { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  .calendar-grid { min-width: 650px; }
+  .calendar-panel { overflow-x: auto !important; }
+  .public-trip-card .public-trip-body { padding: 14px !important; }
+}
+@media (max-width: 390px) {
+  .main { padding: 9px !important; }
+  .cards { grid-template-columns: minmax(0, 1fr) !important; }
+  .top h1 { font-size: 20px !important; }
+  .nav button { padding: 8px 10px !important; font-size: 11px !important; }
+  .choice { grid-template-columns: minmax(0, 1fr) !important; }
+}
+</style>
+
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
@@ -960,4 +1058,15 @@ function initCLTUR(){
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', initCLTUR, {once:true});
 else initCLTUR();
-</script></body></html>
+</script>
+<script id="cltur-pwa-register">
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function (err) {
+      console.warn('CL TUR: não foi possível registrar o service worker.', err);
+    });
+  });
+}
+</script>
+
+</body></html>
