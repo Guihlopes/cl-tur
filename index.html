@@ -517,6 +517,102 @@ table.table { width: 100%; }
 }
 </style>
 
+
+<style id="cltur-dashboard-calendar-mobile-fix">
+/* Ajustes específicos para Dashboard e Calendário em telas menores */
+@media (max-width: 760px) {
+  /* Dashboard: remover rolagem lateral das tabelas; no celular os dados ficam compactos */
+  .dashboard-table, .dashboard-table table, .dashboard-table .table,
+  .dashboard-report-table, .dashboard-report-table table {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  .dashboard-table, .dashboard-report-table {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .dashboard-table .table, .dashboard-report-table .table {
+    font-size: 11px !important;
+  }
+  .dashboard-table .table th, .dashboard-table .table td,
+  .dashboard-report-table .table th, .dashboard-report-table .table td {
+    padding: 7px 6px !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+  /* Cartões do Dashboard: reduzir espaços e manter grade equilibrada */
+  .dashboard-cards, .dashboard-summary, .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  /* Calendário: trocar a grade mensal larga por uma lista vertical compacta no mobile */
+  .calendar-panel { overflow: visible !important; }
+  .calendar-head {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .calendar-controls {
+    display: grid !important;
+    grid-template-columns: 42px 1fr 42px !important;
+    gap: 6px !important;
+    width: 100% !important;
+  }
+  .calendar-controls select, .calendar-controls input {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  .calendar-controls select { grid-column: 1 / 3 !important; grid-row: 2 !important; }
+  .calendar-controls input { grid-column: 3 / 4 !important; grid-row: 2 !important; }
+  .calendar-legend {
+    display: flex !important; flex-wrap: wrap !important; gap: 7px 12px !important;
+    font-size: 11px !important; margin: 10px 0 !important;
+  }
+  .calendar-weekdays { display:none !important; }
+  .calendar-grid {
+    min-width: 0 !important; width: 100% !important;
+    display: flex !important; flex-direction: column !important; gap: 7px !important;
+  }
+  .cal-day {
+    min-height: 0 !important; height: auto !important;
+    display: grid !important; grid-template-columns: 44px minmax(0,1fr) !important;
+    align-items: start !important; gap: 7px !important;
+    padding: 8px 9px !important; border-radius: 10px !important;
+  }
+  .cal-num { font-size: 12px !important; font-weight: 800 !important; }
+  .cal-event {
+    display: inline-block !important; max-width: 100% !important;
+    white-space: normal !important; text-align: left !important;
+    overflow-wrap: anywhere !important; font-size: 11px !important;
+    padding: 5px 7px !important; margin: 0 0 4px !important;
+  }
+  .cal-more { grid-column: 2 !important; font-size: 10px !important; }
+  .cal-day .cal-event:only-of-type { margin-bottom: 0 !important; }
+}
+@media (max-width: 390px) {
+  .calendar-controls { grid-template-columns: 36px minmax(0,1fr) 36px !important; }
+  .calendar-controls select { grid-column: 1 / 3 !important; }
+  .calendar-controls input { grid-column: 3 / 4 !important; }
+  .calendar-legend { gap: 6px 9px !important; }
+}
+</style>
+
+
+<style id="cltur-dashboard-layout-tune">
+@media (max-width: 760px) {
+  .report-summary-strip { padding: 7px !important; gap: 5px !important; margin: 8px 0 2px !important; }
+  .report-summary-strip div { padding: 7px !important; }
+  .report-summary-strip b { font-size: 16px !important; }
+  .report-summary-strip span { font-size: 10px !important; }
+  .section-heading { display:flex; align-items:flex-start; flex-wrap:wrap; gap:8px; }
+  .section-heading h2, .section-heading h3 { font-size:15px !important; }
+  .dashboard-head { padding: 12px !important; }
+  .dashboard-head .admin-subtitle { font-size: 11px !important; }
+  .calendar-grid .muted-day { opacity: .6; }
+}
+</style>
+
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
