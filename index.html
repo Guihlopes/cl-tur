@@ -700,6 +700,20 @@ table.table { width: 100%; }
 }
 </style>
 
+<style id="cltur-freight-mobile-cards">
+.freight-mobile-list{display:none}
+.freight-mobile-card{background:#fff;border:1px solid #e3eaf3;border-radius:14px;padding:13px;margin-top:10px;box-shadow:0 4px 14px rgba(15,23,42,.045);min-width:0}
+.freight-mobile-head{display:flex;justify-content:space-between;align-items:flex-start;gap:9px;padding-bottom:10px;border-bottom:1px solid #edf1f6}
+.freight-mobile-head>div{display:flex;flex-direction:column;gap:3px;min-width:0}.freight-mobile-head>div b{overflow-wrap:anywhere}.freight-mobile-head small{color:#667085;font-size:11px}
+.freight-mobile-info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:11px 0}
+.freight-mobile-info>div{display:flex;flex-direction:column;gap:3px;min-width:0}.freight-mobile-info small{font-size:10px;color:#667085}.freight-mobile-info b{font-size:12px;overflow-wrap:anywhere}
+.freight-mobile-actions{display:flex;gap:7px;flex-wrap:wrap}.freight-mobile-actions .btn{flex:1;min-width:70px;padding:9px 7px!important;font-size:11px}
+@media(max-width:760px){
+ .freight-desktop-list{display:none!important}.freight-mobile-list{display:block!important}
+ .freight-mobile-list{width:100%;min-width:0}
+ .freight-mobile-card{width:100%;box-sizing:border-box}
+}
+</style>
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
@@ -1075,6 +1089,20 @@ function charters(){
   const contracted=data.charters.filter(c=>['Fechado','Contratado','Em andamento','Concluído'].includes(c.status)).length;
   const received=data.charters.reduce((a,c)=>a+Number(c.deposit||0),0);
   const pending=data.charters.reduce((a,c)=>a+charterRemaining(c),0);
+  const mobileRows=data.charters.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(c=>`
+    <article class="freight-mobile-card">
+      <div class="freight-mobile-head"><div><b>${esc(c.client||'Cliente não informado')}</b><small>${esc(c.phone||'')}</small></div><span class="pill ${charterStatusClass(c.status)}">${esc(c.status||'Orçamento solicitado')}</span></div>
+      <div class="freight-mobile-info">
+        <div><small>Origem</small><b>${esc(c.origin||'—')}</b></div>
+        <div><small>Destino</small><b>${esc(c.destination||'—')}</b></div>
+        <div><small>Data</small><b>${fmt(c.date)}${c.returnDate?' → '+fmt(c.returnDate):''}</b></div>
+        <div><small>Passageiros / veículo</small><b>${Number(c.passengers||0)||'—'} · ${esc(c.vehicle||'A definir')}</b></div>
+        <div><small>Valor contratado</small><b>${charterIsFinancial(c)?money(c.value||0):'Não contratado'}</b></div>
+        <div><small>Recebido / a receber</small><b>${money(c.deposit||0)} / ${money(charterRemaining(c))}</b></div>
+      </div>
+      <div class="freight-mobile-actions"><button class="btn secondary" onclick="charterDetail('${c.id}')">Ver</button><button class="btn secondary" onclick="charterForm('${c.id}')">Editar</button><button class="btn danger" onclick="delCharter('${c.id}')">Excluir</button></div>
+    </article>`).join('');
+
   const rows=data.charters.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(c=>`
     <tr>
       <td><b>${esc(c.client)}</b><br><small>${esc(c.phone||'')}</small></td>
@@ -1103,7 +1131,7 @@ function charters(){
         <div><h2>Solicitações de fretamento</h2><p class="muted">Acompanhe o pedido desde o primeiro contato até a conclusão do serviço.</p></div>
         <button class="btn" onclick="charterForm()">+ Novo fretamento</button>
       </div>
-      ${rows?`<div style="overflow:auto"><table class="table"><tr><th>Cliente</th><th>Rota / grupo</th><th>Data</th><th>Valor contratado</th><th>Recebido</th><th>Status</th><th></th></tr>${rows}</table></div>`:'<div class="empty">Nenhum fretamento cadastrado. Solicitações feitas pelo portal do cliente aparecerão aqui.</div>'}
+      ${rows?`<div class="freight-desktop-list" style="overflow:auto"><table class="table"><tr><th>Cliente</th><th>Rota / grupo</th><th>Data</th><th>Valor contratado</th><th>Recebido</th><th>Status</th><th></th></tr>${rows}</table></div><div class="freight-mobile-list">${mobileRows}</div>`:'<div class="empty">Nenhum fretamento cadastrado. Solicitações feitas pelo portal do cliente aparecerão aqui.</div>'}
     </div>
 
     <div class="panel">
