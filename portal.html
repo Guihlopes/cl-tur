@@ -31,6 +31,24 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 function seatTaken(tid,vehicleIndex,seat){return data.people.some(p=>p.tripId==tid&&Number(p.vehicleIndex||0)===Number(vehicleIndex)&&String(p.seat||'')===String(seat))}
 function vehicleLabel(v,i){return `${v.type||'Veículo'} ${i+1}`}
 let reservationSeats={};function closeModal(){modal.classList.add('hidden');modal.innerHTML=''}modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+async function loadPublicTrips(){
+  app.innerHTML='<main class="content"><div class="empty">Carregando excursões disponíveis...</div></main>';
+  try{
+    const response=await fetch(CLTUR_SUPABASE_URL+'/rest/v1/rpc/get_public_cltur_trips',{
+      method:'POST',
+      headers:{'apikey':CLTUR_SUPABASE_KEY,'Authorization':'Bearer '+CLTUR_SUPABASE_KEY,'Content-Type':'application/json'},
+      body:'{}'
+    });
+    if(!response.ok){let detail='';try{detail=await response.text()}catch(_){};throw new Error(detail||'HTTP '+response.status);}
+    const result=await response.json();
+    data.trips=Array.isArray(result?.trips)?result.trips:[];
+    data.people=Array.isArray(result?.people)?result.people:[];
+    publicPage();
+  }catch(error){
+    console.error('Falha ao carregar excursões públicas da CL TUR:',error);
+    app.innerHTML='<main class="content"><div class="empty"><div style="font-size:40px">🚌</div><h3>Não foi possível carregar as excursões</h3><p>A equipe da CL TUR precisa concluir a configuração de publicação. Tente novamente em alguns instantes.</p><button class="btn primary" onclick="loadPublicTrips()">Tentar novamente</button></div></main>';
+  }
+}
 function publicPage(){const trips=data.trips.filter(t=>t.published);const cards=trips.map(t=>{let free=Math.max(0,totalSeats(t)-occupied(t.id));return `<article class="trip"><div class="trip-top"><div class="trip-date">📅 ${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''}</div><h3>${esc(t.destination)}</h3><div class="origin">📍 Saída: ${esc(t.origin||'A confirmar')}</div></div><div class="trip-body"><div class="chips">${(t.vehicles||[]).map(v=>`<span class="chip">${v.type==='Van'?'🚐':'🚌'} ${esc(v.type)} · ${v.seats} lugares</span>`).join('')}</div><div class="price-row"><div class="price">${money(t.price)}<small>por pessoa</small></div><div class="vac">${free} vagas<br><span style="color:#64748b;font-weight:600">disponíveis</span></div></div><button class="btn primary" onclick="reserve('${t.id}')">Ver detalhes e reservar →</button></div></article>`}).join('');app.innerHTML=`<header class="top"><nav class="nav"><div class="brand"><img src="${logo}" alt="CL TUR"><div><strong>CL TUR</strong><small>Transporte & Turismo</small></div></div><div class="navlinks"><button onclick="scrollToId('trips')">Excursões</button><button onclick="freight()">Orçamento de frete</button><button onclick="scrollToId('about')">Contato</button></div></nav></header><section class="hero"><div class="hero-inner"><div><span class="eyebrow">✈️ Viaje com quem entende de estrada</span><h1>Sua próxima viagem começa aqui.</h1><p>Encontre excursões, consulte vagas e faça sua reserva de forma simples. Precisa de transporte exclusivo? Também fazemos fretamentos.</p><div class="hero-actions"><button class="btn primary" onclick="scrollToId('trips')">🚌 Ver excursões</button></div></div><div class="hero-card"><div class="big">${trips.length}</div><strong>excursões disponíveis</strong><p>Escolha seu destino, confira as vagas e reserve seus lugares.</p><hr style="border:0;border-top:1px solid rgba(255,255,255,.2);margin:18px 0"><strong>🚐 Transporte exclusivo</strong><p>Solicite um orçamento para sua família, grupo, empresa ou evento.</p></div></div></section><main class="content"><section id="trips"><div class="section-head"><div><h2>Próximas excursões</h2><p>Escolha seu destino e garanta sua vaga.</p></div></div>${cards?`<div class="trip-grid">${cards}</div>`:`<div class="empty"><div style="font-size:40px">🗺️</div><h3>Nenhuma excursão aberta no momento</h3><p>Mas você pode solicitar um orçamento de fretamento para seu grupo.</p></div>`}</section><section class="quick" id="about"><button type="button" class="quick-card" onclick="scrollToId('trips')"><div class="quick-icon">🚌</div><div><h3>Excursões</h3><p>Viagens organizadas com datas, valores e vagas informados de forma clara.</p></div><span class="quick-arrow">→</span></button><button type="button" class="quick-card" onclick="freight()"><div class="quick-icon">🚐</div><div><h3>Fretamentos</h3><p>Precisa levar um grupo? Conte o roteiro para a CL TUR e peça seu orçamento.</p></div><span class="quick-arrow">→</span></button><button type="button" class="quick-card" onclick="window.open('https://wa.me/5534999146922?text=Ol%C3%A1!%20Gostaria%20de%20falar%20com%20a%20CL%20TUR.','_blank')"><div class="quick-icon">💬</div><div><h3>Atendimento</h3><p>Fale com a equipe pelo WhatsApp para tirar dúvidas e acompanhar sua solicitação.</p></div><span class="quick-arrow">→</span></button></section></main><footer><div class="foot"><div><strong>CL TUR Transporte & Turismo</strong><div class="cnpj">CNPJ: 65.149.753/0001-09</div><div style="margin-top:6px">Sua viagem começa aqui.</div></div><div><div>📱 WhatsApp: (34) 99914-6922</div><div style="margin-top:6px">📸 Instagram: <a href="https://www.instagram.com/cl_tur_exursoes_turismo/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;font-weight:700;cursor:pointer">@cl_tur_exursoes_turismo</a></div></div></div></footer>`}
 function scrollToId(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth'})}
 function childRule(t,birth){
@@ -89,5 +107,5 @@ async function submitFreight(e){
     alert(error.message||'Falha ao enviar o pedido de orçamento. Confira sua conexão e tente novamente.');
     if(btn){btn.disabled=false;btn.textContent=btn.dataset.originalText||'Solicitar orçamento →';}
   }
-}publicPage();
+}loadPublicTrips();
 </script></body></html>
