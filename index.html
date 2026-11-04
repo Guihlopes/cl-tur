@@ -1244,32 +1244,39 @@ function whatsappBR(phone){
   if(n.length===10 || n.length===11) return '55'+n;
   return n;
 }
+function generateCharterQuotePDF(id){
+  const c=data.charters.find(x=>x.id==id);if(!c)return;
+  const value=Number(document.getElementById('quoteAnswerValue')?.value||c.quoteValue||0);
+  const vehicle=document.getElementById('quoteAnswerVehicle')?.value||c.recommendedVehicle||c.vehicle||'A definir';
+  let validity=(document.getElementById('quoteAnswerValidity')?.value||c.quoteValidity||'').trim();
+  if(validity&&/^\\d+$/.test(validity))validity+=' dias';
+  const w=window.open('','_blank');
+  if(!w){alert('O navegador bloqueou a janela do PDF. Permita pop-ups para este site e tente novamente.');return false}
+  const row=(label,val)=>'<div class="row"><span>'+label+'</span><b>'+esc(val||'Não informado')+'</b></div>';
+  const html='<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Orçamento CL TUR - '+esc(c.client)+'</title><style>*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#172033;margin:0;background:#fff}.page{max-width:800px;margin:0 auto;padding:42px}.head{background:#10233f;color:#fff;padding:28px 32px;border-radius:14px}.brand{font-size:25px;font-weight:800;letter-spacing:1px}.sub{color:#c8d8ed;font-size:12px;margin-top:5px}.tag{display:inline-block;background:#eaf4ff;color:#1556a8;border-radius:20px;padding:7px 12px;font-size:11px;font-weight:bold;margin:24px 0 12px}h1{font-size:26px;margin:0 0 6px}.muted{color:#64748b;font-size:12px}.section{margin-top:24px}.section h2{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:#1769d2;border-bottom:1px solid #dbe4ef;padding-bottom:8px}.row{display:flex;justify-content:space-between;gap:18px;padding:10px 2px;border-bottom:1px solid #edf1f6;font-size:13px}.row span{color:#64748b}.row b{text-align:right}.price{margin-top:24px;background:#edf6ff;border:1px solid #c9e2ff;border-radius:14px;padding:22px}.price small{color:#47617f;text-transform:uppercase;font-size:10px;letter-spacing:1px}.amount{font-size:32px;font-weight:800;color:#1057ae;margin-top:6px}.foot{margin-top:32px;padding-top:14px;border-top:1px solid #dbe4ef;color:#64748b;font-size:11px;line-height:1.6}.valid{margin-top:12px;font-size:12px;color:#475569}@page{size:A4;margin:12mm}@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.page{padding:18px}}</style></head><body><main class="page"><header class="head"><div class="brand">CL TUR</div><div class="sub">TRANSPORTE &amp; TURISMO</div></header><div class="tag">PROPOSTA COMERCIAL • ORÇAMENTO DE FRETAMENTO</div><h1>Orçamento de viagem</h1><div class="muted">Documento preparado especialmente para você.</div><section class="section"><h2>Dados do cliente</h2>'+row('Cliente',c.client)+'</section><section class="section"><h2>Detalhes da viagem</h2>'+row('Local de saída',c.origin)+row('Destino',c.destination)+row('Data de ida',fmt(c.date)+(c.departureTime?' às '+c.departureTime:''))+row('Retorno',c.returnDate?fmt(c.returnDate)+(c.returnTime?' às '+c.returnTime:''):'Somente ida')+row('Quantidade de passageiros',c.passengers)+row('Veículo indicado',vehicle)+'</section>'+(c.notes?'<section class="section"><h2>Observações</h2><p style="font-size:13px;line-height:1.6">'+esc(c.notes)+'</p></section>':'')+'<section class="price"><small>Investimento total do fretamento</small><div class="amount">'+money(value)+'</div>'+(validity?'<div class="valid">Validade deste orçamento: <b>'+esc(validity)+'</b></div>':'')+'</section><footer class="foot"><b>CL TUR Transporte &amp; Turismo</b><br>Obrigado por considerar nossos serviços. Será um prazer fazer parte da sua viagem!<br><span>Orçamento sujeito à confirmação de disponibilidade na data solicitada.</span></footer></main><script>window.onload=function(){window.focus();window.print()}<\\/script></body></html>';
+  w.document.open();w.document.write(html);w.document.close();return true;
+}
 function sendQuoteWhatsApp(id){
   const c=data.charters.find(x=>x.id==id); if(!c)return;
   const type=document.getElementById('quoteMessageType')?.value||'quote';
   const value=Number(document.getElementById('quoteAnswerValue')?.value||0);
-  if(type==='quote' && !value){alert('Informe o valor do orçamento antes de enviar.');return}
+  if(type==='quote' && !value){alert('Informe o valor do orçamento antes de gerar o PDF.');return}
   if(type==='custom' && !(document.getElementById('quotePreview')?.value||'').trim()){alert('Digite a mensagem personalizada no quadro de mensagem antes de enviar.');return}
+  const phone=whatsappBR(c.phone);
+  if(!phone || !(phone.length===12 || phone.length===13) || !phone.startsWith('55')){alert('O WhatsApp precisa ter DDD e número válido. Exemplo: 34991851948.');return}
   if(type==='quote'){
     c.quoteValue=value;
     c.recommendedVehicle=document.getElementById('quoteAnswerVehicle')?.value||c.vehicle;
-    if(!charterIsFinancial(c)) c.status='Aguardando fechamento';
-  }else if(type==='unavailable'){
-    if(!charterIsFinancial(c)) c.status='Aguardando fechamento';
-  }else if(type==='custom'){
-    if(!charterIsFinancial(c)) c.status='Aguardando fechamento';
+    c.quoteValidity=(document.getElementById('quoteAnswerValidity')?.value||'').trim();
+    if(!charterIsFinancial(c))c.status='Aguardando fechamento';
+    if(!generateCharterQuotePDF(id))return;
+  }else{
+    if(!charterIsFinancial(c))c.status='Aguardando fechamento';
   }
-  c.updatedAt=new Date().toISOString();
-  save();
-  if(c.portalRequestId){window.clturSupabase.from('cltur_public_requests').update({status:'Em atendimento'}).eq('id',c.portalRequestId).then(({error})=>{if(error)console.error('Não foi possível atualizar o status do pedido do portal:',error);else syncPortalFreightRequests()})}
-  const phone=whatsappBR(c.phone);
-  if(!phone || !(phone.length===12 || phone.length===13) || !phone.startsWith('55')){
-    alert('O WhatsApp precisa ter DDD e número válido. Exemplo: 34991851948.');
-    return;
-  }
-  const msg=buildQuoteMessage(id);
-  const url='https://api.whatsapp.com/send?phone='+phone+'&text='+encodeURIComponent(msg);
-  window.open(url,'_blank');
+  c.updatedAt=new Date().toISOString();save();
+  if(c.portalRequestId&&window.clturSupabase){window.clturSupabase.from('cltur_public_requests').update({status:'Em atendimento'}).eq('id',c.portalRequestId).then(({error})=>{if(error)console.error('Não foi possível atualizar o status do pedido do portal:',error);else syncPortalFreightRequests()})}
+  const msg=type==='quote'?'Olá, '+c.client+'! Segue o orçamento da CL TUR em PDF. Estou encaminhando o documento com os dados da viagem, veículo e valor. Por favor, confira o arquivo em anexo.\n\nCL TUR Transporte & Turismo':buildQuoteMessage(id);
+  window.open('https://api.whatsapp.com/send?phone='+phone+'&text='+encodeURIComponent(msg),'_blank');
   closeModal();
 }
 
