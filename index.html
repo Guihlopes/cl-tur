@@ -1068,14 +1068,27 @@ function permanentlyDeleteTrip(trashId){
  if(!confirm('Excluir permanentemente esta excursão e todos os dados guardados na lixeira? Esta ação não poderá ser desfeita.'))return;
  data.trash=data.trash.filter(x=>x.id!==trashId);save();render('trash');
 }
+function restoreTrashItem(id){
+ const item=(data.trash||[]).find(x=>x.id===id);if(!item)return;
+ if(new Date(item.expiresAt).getTime()<Date.now()){alert('O prazo de 30 dias para restauração terminou.');return;}
+ if(item.kind==='trip')return restoreTrip(id);
+ if(item.kind==='charter'){if(data.charters.some(x=>String(x.id)===String(item.charter.id))){alert('Fretamento já ativo.');return;}data.charters.push(item.charter);data.expenses.push(...(item.expenses||[]).filter(e=>!data.expenses.some(x=>String(x.id)===String(e.id))))}
+ else if(item.kind==='person'){if(data.people.some(x=>String(x.id)===String(item.person.id))){alert('Passageiro já ativo.');return;}if(!data.trips.some(t=>String(t.id)===String(item.person.tripId))){alert('Restaure a excursão primeiro.');return;}data.people.push(item.person);data.payments.push(...(item.payments||[]).filter(p=>!data.payments.some(x=>String(x.id)===String(p.id))))}
+ else if(item.kind==='expense'){data.expenses.push(item.expense)}
+ else if(item.kind==='payment'){if(!data.people.some(p=>String(p.id)===String(item.payment.personId))){alert('Restaure o passageiro primeiro.');return;}data.payments.push(item.payment)}
+ data.trash=data.trash.filter(x=>x.id!==id);save();render('trash');alert('Item recuperado com sucesso!');
+}
 function trash(){
  const items=(data.trash||[]).slice().sort((a,b)=>new Date(b.deletedAt)-new Date(a.deletedAt));
- const cards=items.map(item=>{
-  const t=item.trip||{},expired=new Date(item.expiresAt).getTime()<Date.now();
-  const remaining=Math.max(0,Math.ceil((new Date(item.expiresAt).getTime()-Date.now())/86400000));
-  return `<article class="panel" style="margin-bottom:14px"><div class="section-heading"><div><h2>🚌 ${esc(t.destination||'Excursão sem destino')}</h2><p class="muted">Excluída em ${fmt((item.deletedAt||'').slice(0,10))} · ${(item.people||[]).length} passageiro(s) · ${(item.payments||[]).length} pagamento(s)</p><p class="muted">${expired?'Prazo de restauração encerrado': 'Restam '+remaining+' dia(s) para restaurar'}</p></div><span class="pill ${expired?'warn':'ok'}">${expired?'Expirada':'Na lixeira'}</span></div><div class="action-buttons"><button class="btn" ${expired?'disabled':''} onclick="restoreTrip('${esc(item.id)}')">♻️ Restaurar excursão</button><button class="btn danger" onclick="permanentlyDeleteTrip('${esc(item.id)}')">Excluir permanentemente</button></div></article>`;
+ const cards=items.map(item=>{const expired=new Date(item.expiresAt).getTime()<Date.now();const days=Math.max(0,Math.ceil((new Date(item.expiresAt)-Date.now())/86400000));let title='Item excluído',detail='';
+ if(item.kind==='trip'){title='🚌 '+esc(item.trip?.destination||'Excursão');detail=(item.people||[]).length+' passageiro(s) · '+(item.payments||[]).length+' pagamento(s)'}
+ if(item.kind==='charter'){title='🚐 '+esc(item.charter?.client||'Fretamento');detail=esc(item.charter?.destination||'')}
+ if(item.kind==='person'){title='👤 '+esc(item.person?.name||'Passageiro');detail='Passageiro · '+(item.payments||[]).length+' pagamento(s)'}
+ if(item.kind==='expense'){title='💸 '+esc(item.expense?.description||'Despesa');detail=money(item.expense?.value||0)}
+ if(item.kind==='payment'){title='💳 Pagamento';detail=money(item.payment?.amount||0)}
+ return '<article class="panel" style="margin-bottom:14px"><h2>'+title+'</h2><p class="muted">'+detail+' · '+(expired?'Prazo encerrado':'Restam '+days+' dia(s)')+'</p><div class="action-buttons"><button class="btn" '+(expired?'disabled':'')+' onclick="restoreTrashItem(\''+esc(item.id)+'\')">♻️ Recuperar</button><button class="btn danger" onclick="permanentlyDeleteTrip(\''+esc(item.id)+'\')">Excluir permanentemente</button></div></article>';
  }).join('');
- main.innerHTML=layout('Lixeira',`<div class="panel"><h2>Excursões excluídas</h2><p class="muted">As excursões ficam aqui por 30 dias. A restauração recupera também passageiros, pagamentos e despesas vinculados.</p></div>${cards||'<div class="panel"><div class="empty">A lixeira está vazia.</div></div>'}`);
+ main.innerHTML=layout('Lixeira','<div class="panel"><h2>Itens excluídos</h2><p class="muted">Excursões, fretamentos, passageiros, pagamentos e despesas ficam disponíveis por 30 dias.</p></div>'+(cards||'<div class="panel"><div class="empty">A lixeira está vazia.</div></div>'));
 }
 function people(){
   const cards=data.trips.slice().sort((a,b)=>(a.departure||'').localeCompare(b.departure||'')).map(t=>{
@@ -1118,9 +1131,9 @@ function savePaymentEdit(e,id,pid){
 }
 function newPayment(pid){let p=data.people.find(x=>x.id==pid);if(!p)return;openModal(`<h2>Registrar pagamento</h2><form onsubmit="savePayment(event,'${pid}')"><div class="formgrid"><div class="field"><label>Data</label><input type="date" name="date" value="${new Date().toISOString().slice(0,10)}" required></div><div class="field"><label>Forma de pagamento</label><select name="method"><option>Pix</option><option>Cartão</option><option>Dinheiro</option><option>Transferência</option></select></div><div class="field"><label>Valor</label><div class="currency-field"><span>R$</span><input type="text" inputmode="decimal" name="amount" value="${moneyInputValue(Math.max(0,Number(p.value||0)-paymentTotal(p)).toFixed(2))}" placeholder="0,00" onblur="formatMoneyField(this)" required></div></div><div class="field full"><label>Observação</label><input name="note" placeholder="Ex.: 2ª parcela, sinal, pagamento final..."></div></div><div class="notice">Saldo atual: <b>${money(Math.max(0,Number(p.value||0)-paymentTotal(p)))}</b></div><div class="actions"><button type="button" class="btn secondary" onclick="closeModal();paymentForm('${pid}')">Cancelar</button><button class="btn">Salvar pagamento</button></div></form>`)}
 function savePayment(e,pid){e.preventDefault();let p=data.people.find(x=>x.id==pid);if(!p)return;let f=new FormData(e.target),amount=parseMoneyBR(f.get('amount'));if(amount<=0)return alert('Informe um valor válido.');let existing=passengerPayments(pid);if(!existing.length&&Number(p.paid||0)>0){data.payments.push({id:'legacy-'+pid,personId:pid,date:new Date().toISOString().slice(0,10),amount:Number(p.paid||0),method:'Transferência',note:'Pagamento anterior importado'});}data.payments.push({id:Date.now().toString(),personId:pid,date:f.get('date'),amount,method:f.get('method'),note:f.get('note')});p.paid=paymentTotal(p);p.status=paymentStatus(p);closeModal();save();setTimeout(()=>paymentForm(pid),50)}
-function deletePayment(id,pid){if(!confirm('Excluir este pagamento?'))return;data.payments=data.payments.filter(x=>x.id!=id);let p=data.people.find(x=>x.id==pid);if(p){p.paid=paymentTotal(p);p.status=paymentStatus(p)}save();setTimeout(()=>paymentForm(pid),50)}
-function delPerson(id){if(confirm('Excluir passageiro e seu histórico de pagamentos?')){data.people=data.people.filter(p=>p.id!=id);data.payments=data.payments.filter(x=>x.personId!=id);save();render('people')}}
-function delPersonFromFinance(id,tripId){let p=data.people.find(x=>x.id==id);if(!p)return;if(!confirm('Excluir '+p.name+' e todo o histórico de pagamentos vinculado?'))return;data.people=data.people.filter(x=>x.id!=id);data.payments=data.payments.filter(x=>x.personId!=id);save();render('finance');tripFinance(tripId)}
+function deletePayment(id,pid){const item=data.payments.find(x=>x.id==id);if(!item||!confirm('Mover este pagamento para a Lixeira?'))return;data.trash=data.trash||[];data.trash.push({id:'trash-payment-'+Date.now(),kind:'payment',deletedAt:new Date().toISOString(),expiresAt:new Date(Date.now()+30*86400000).toISOString(),payment:item});data.payments=data.payments.filter(x=>x.id!=id);let p=data.people.find(x=>x.id==pid);if(p){p.paid=paymentTotal(p);p.status=paymentStatus(p)}save();setTimeout(()=>paymentForm(pid),50)}
+function delPerson(id){const p=data.people.find(x=>x.id==id);if(!p||!confirm('Mover passageiro e seus pagamentos para a Lixeira?'))return;const payments=data.payments.filter(x=>String(x.personId)===String(id));data.trash=data.trash||[];data.trash.push({id:'trash-person-'+Date.now(),kind:'person',deletedAt:new Date().toISOString(),expiresAt:new Date(Date.now()+30*86400000).toISOString(),person:p,payments});data.people=data.people.filter(x=>x.id!=id);data.payments=data.payments.filter(x=>x.personId!=id);save();render('people')}
+function delPersonFromFinance(id,tripId){let p=data.people.find(x=>x.id==id);if(!p||!confirm('Mover '+p.name+' e seus pagamentos para a Lixeira?'))return;const payments=data.payments.filter(x=>String(x.personId)===String(id));data.trash=data.trash||[];data.trash.push({id:'trash-person-'+Date.now(),kind:'person',deletedAt:new Date().toISOString(),expiresAt:new Date(Date.now()+30*86400000).toISOString(),person:p,payments});data.people=data.people.filter(x=>x.id!=id);data.payments=data.payments.filter(x=>x.personId!=id);save();render('finance');tripFinance(tripId)}
 
 function charterIsFinancial(c){return ['Fechado','Contratado','Em andamento','Concluído'].includes(c?.status||'');}
 function charterFinancialContract(c){return charterIsFinancial(c)?Number(c.value||0):0;}
@@ -1425,17 +1438,7 @@ function saveCharter(e,id){
   else data.charters.push(o);
   closeModal();save();render('charters');
 }
-function delCharter(id){
-  const target=data.charters.find(c=>c.id==id);
-  if(confirm('Excluir este fretamento? Esta ação não poderá ser desfeita.')){
-    if(target?.portalRequestId){
-      if(!Array.isArray(data.dismissedPortalRequestIds))data.dismissedPortalRequestIds=[];
-      if(!data.dismissedPortalRequestIds.map(String).includes(String(target.portalRequestId)))data.dismissedPortalRequestIds.push(String(target.portalRequestId));
-    }
-    data.charters=data.charters.filter(c=>c.id!=id);
-    save();render('charters');
-  }
-}
+function delCharter(id){const target=data.charters.find(c=>c.id==id);if(!target)return;const expenses=data.expenses.filter(e=>String(e.charterId)===String(id));if(!confirm('Mover este fretamento para a Lixeira?'))return;data.trash=data.trash||[];data.trash.push({id:'trash-charter-'+Date.now(),kind:'charter',deletedAt:new Date().toISOString(),expiresAt:new Date(Date.now()+30*86400000).toISOString(),charter:target,expenses});if(target.portalRequestId){data.dismissedPortalRequestIds=data.dismissedPortalRequestIds||[];if(!data.dismissedPortalRequestIds.map(String).includes(String(target.portalRequestId)))data.dismissedPortalRequestIds.push(String(target.portalRequestId))}data.charters=data.charters.filter(c=>c.id!=id);data.expenses=data.expenses.filter(e=>String(e.charterId)!==String(id));save();render('charters')}
 
 function vanExpensePanel(){
  const items=data.expenses.filter(e=>e.vehicle==='van').sort((a,b)=>(b.date||'').localeCompare(a.date||''));
@@ -1466,7 +1469,7 @@ function parseMoneyBR(value){
 }
 function saveExpense(ev,id){ev.preventDefault();let f=new FormData(ev.target),operation=f.get('operation')||'general',tripId='general',charterId='',vehicle='';if(operation==='van')vehicle='van';if(operation.startsWith('trip:'))tripId=operation.slice(5);if(operation.startsWith('charter:'))charterId=operation.slice(8);let old=id?data.expenses.find(e=>e.id==id):null,o={id:id||Date.now().toString(),date:f.get('date'),category:f.get('category')||old?.category||'Outros',description:f.get('description'),tripId,charterId,vehicle,value:parseMoneyBR(f.get('value')),notes:f.get('notes')};if(id){let i=data.expenses.findIndex(x=>x.id==id);if(i>=0)data.expenses[i]=o}else data.expenses.push(o);closeModal();save();render('finance')}
 
-function delExpense(id){if(confirm('Excluir esta despesa?')){data.expenses=data.expenses.filter(e=>e.id!=id);save();render('finance')}}
+function delExpense(id){const item=data.expenses.find(e=>e.id==id);if(!item||!confirm('Mover esta despesa para a Lixeira?'))return;data.trash=data.trash||[];data.trash.push({id:'trash-expense-'+Date.now(),kind:'expense',deletedAt:new Date().toISOString(),expiresAt:new Date(Date.now()+30*86400000).toISOString(),expense:item});data.expenses=data.expenses.filter(e=>e.id!=id);save();render('finance')}
 function exportTripPassengersPDF(tripId){
   const trip=data.trips.find(t=>t.id==tripId);
   if(!trip)return;
