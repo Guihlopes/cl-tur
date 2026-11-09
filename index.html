@@ -715,7 +715,7 @@ table.table { width: 100%; }
 }
 </style>
 </head><body>
-<div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button><button data-page="trash">🗑️ Lixeira</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
+<div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button><button data-page="trash">🗑️ Lixeira</button><button data-page="archive">📁 Arquivo</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
 <div id="cltur-auth-screen">
   <form class="cltur-auth-card" id="cltur-auth-form">
@@ -760,6 +760,7 @@ function normalizeCLTURData(value){
   if(!Array.isArray(d.expenses))d.expenses=[];
   if(!Array.isArray(d.payments))d.payments=[];
   if(!Array.isArray(d.trash))d.trash=[];
+  if(!Array.isArray(d.archive))d.archive=[];
   if(!Array.isArray(d.dismissedPortalRequestIds))d.dismissedPortalRequestIds=[];
   return d;
 }
@@ -775,6 +776,7 @@ async function loadCLTURCloudState(){
     data=normalizeCLTURData(row?.state||{});
     localStorage.setItem(KEY,JSON.stringify(data));
     clturCloudReady=true;
+    archiveExpiredRecords();
     await syncPortalFreightRequests();
     syncFreightNotifications();
     render('dashboard');
@@ -892,9 +894,21 @@ async function syncPortalFreightRequests(){
  finally{clturPortalSyncRunning=false}
 }
 
+function localDateISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function archiveExpiredRecords(){
+ if(!clturCloudReady)return false;data.archive=data.archive||[];const today=localDateISO();let changed=false;
+ const expiredTrip=t=>{const end=t.returnDate||t.departure;return !!end&&end<today};
+ const expiredCharter=c=>{const end=c.returnDate||c.date;return !!end&&end<today};
+ data.trips.filter(expiredTrip).forEach(t=>{const people=data.people.filter(p=>String(p.tripId)===String(t.id));const ids=new Set(people.map(p=>String(p.id)));data.archive.push({id:'archive-trip-'+t.id,kind:'trip',archivedAt:new Date().toISOString(),record:t,people,payments:data.payments.filter(p=>ids.has(String(p.personId))),expenses:data.expenses.filter(e=>String(e.tripId)===String(t.id))});data.people=data.people.filter(p=>String(p.tripId)!==String(t.id));data.payments=data.payments.filter(p=>!ids.has(String(p.personId)));data.expenses=data.expenses.filter(e=>String(e.tripId)!==String(t.id));data.trips=data.trips.filter(x=>String(x.id)!==String(t.id));changed=true});
+ data.charters.filter(expiredCharter).forEach(c=>{data.archive.push({id:'archive-charter-'+c.id,kind:'charter',archivedAt:new Date().toISOString(),record:c,expenses:data.expenses.filter(e=>String(e.charterId)===String(c.id))});data.expenses=data.expenses.filter(e=>String(e.charterId)!==String(c.id));data.charters=data.charters.filter(x=>String(x.id)!==String(c.id));changed=true});
+ if(changed){localStorage.setItem(KEY,JSON.stringify(data));saveCLTURCloudState()}return changed;
+}
+function restoreArchivedRecord(id){const item=(data.archive||[]).find(x=>x.id===id);if(!item)return;const r=item.record;if(item.kind==='trip'){if(data.trips.some(x=>String(x.id)===String(r.id))){alert('Já existe uma excursão ativa com esse identificador.');return}data.trips.push(r);data.people.push(...(item.people||[]));data.payments.push(...(item.payments||[]).filter(p=>!data.payments.some(x=>String(x.id)===String(p.id))));data.expenses.push(...(item.expenses||[]).filter(e=>!data.expenses.some(x=>String(x.id)===String(e.id))))}else{if(data.charters.some(x=>String(x.id)===String(r.id))){alert('Já existe um fretamento ativo com esse identificador.');return}data.charters.push(r);data.expenses.push(...(item.expenses||[]).filter(e=>!data.expenses.some(x=>String(x.id)===String(e.id))))}data.archive=data.archive.filter(x=>x.id!==id);save();render('archive');alert('Registro restaurado com sucesso!')}
+function archivePage(){const items=(data.archive||[]).slice().sort((a,b)=>new Date(b.archivedAt)-new Date(a.archivedAt));const cards=items.map(item=>{const r=item.record||{},trip=item.kind==='trip';return '<article class="panel" style="margin-bottom:14px"><div class="section-heading"><div><h2>'+(trip?'🚌 '+esc(r.destination||'Excursão'):'🚐 '+esc(r.client||'Fretamento'))+'</h2><p class="muted">'+(trip?'Excursão':'Fretamento')+' · Data: '+fmt(trip?(r.departure||''):(r.date||''))+(trip?' · '+((item.people||[]).length)+' passageiro(s)':'')+'</p><p class="muted">Arquivado em '+fmt((item.archivedAt||'').slice(0,10))+'</p></div><span class="pill ok">Arquivado</span></div><button class="btn" onclick="restoreArchivedRecord(\''+esc(item.id)+'\')">↩️ Restaurar para ativos</button></article>'}).join('');main.innerHTML=layout('Arquivo','<div class="panel"><h2>Excursões e fretamentos arquivados</h2><p class="muted">Arquivados automaticamente após a data de retorno (ou data do serviço, quando não há retorno). Os dados relacionados são preservados e podem ser restaurados.</p></div>'+(cards||'<div class="panel"><div class="empty">Nenhum registro arquivado.</div></div>'))}
 function render(page='dashboard'){
+ archiveExpiredRecords();
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
- if(page==='dashboard')dashboard(); if(page==='trips')trips(); if(page==='people')people(); if(page==='charters')charters(); if(page==='finance')finance(); if(page==='calendar')calendar(); if(page==='reports')reports(); if(page==='public')publicPage(); if(page==='trash')trash();
+ if(page==='dashboard')dashboard(); if(page==='trips')trips(); if(page==='people')people(); if(page==='charters')charters(); if(page==='finance')finance(); if(page==='calendar')calendar(); if(page==='reports')reports(); if(page==='public')publicPage(); if(page==='trash')trash(); if(page==='archive')archivePage();
 }
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>render(b.dataset.page));
 if(Array.isArray(data.charters)){let changed=false;data.charters.forEach(c=>{if(['Orçamento solicitado','Orçamento'].includes(c.status) && !Number(c.value||0)){c.status='Aguardando fechamento';changed=true}});if(changed)localStorage.setItem(KEY,JSON.stringify(data))}
