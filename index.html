@@ -55,7 +55,7 @@
           profile.nome, profile.name, profile.nome_completo, profile.usuario,
           session.user?.email
         ].filter(Boolean).join(' ').toLowerCase();
-        if (larissaIdentity.includes('larissa')) {
+        if (larissaIdentity.includes('larissa') || larissaIdentity.includes('guilherme') || larissaIdentity.includes('gui')) {
           const noticeKey = 'cltur_layout_update_notice_larissa_v1';
           if (!localStorage.getItem(noticeKey)) {
             const showNotice = () => {
