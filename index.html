@@ -49,7 +49,40 @@
           showLogin('Seu usuário entrou, mas o perfil administrativo não foi reconhecido.');
           return false;
         }
-        hideLogin(); window.dispatchEvent(new Event('cltur-admin-ready')); return true;
+        hideLogin();
+        // Aviso de boas-vindas exibido uma única vez para a conta da Larissa.
+        const larissaIdentity = [
+          profile.nome, profile.name, profile.nome_completo, profile.usuario,
+          session.user?.email
+        ].filter(Boolean).join(' ').toLowerCase();
+        if (larissaIdentity.includes('larissa')) {
+          const noticeKey = 'cltur_layout_update_notice_larissa_v1';
+          if (!localStorage.getItem(noticeKey)) {
+            const showNotice = () => {
+              if (document.getElementById('cltur-layout-welcome')) return;
+              const overlay = document.createElement('div');
+              overlay.id = 'cltur-layout-welcome';
+              overlay.innerHTML = `
+                <div class="cltur-welcome-card" role="dialog" aria-modal="true" aria-labelledby="cltur-welcome-title">
+                  <div class="cltur-welcome-icon">✨</div>
+                  <div class="cltur-welcome-tag">NOVIDADE NA CL TUR</div>
+                  <h2 id="cltur-welcome-title">Tem novidade por aqui!</h2>
+                  <p>Atualizamos o visual do sistema para deixar tudo mais bonito, moderno e agradável de usar.</p>
+                  <p>As funcionalidades continuam as mesmas. A mudança foi feita para melhorar sua experiência no dia a dia. 💙</p>
+                  <button type="button" id="cltur-welcome-close">Entendi, vamos lá!</button>
+                </div>`;
+              document.body.appendChild(overlay);
+              const close = () => {
+                localStorage.setItem(noticeKey, '1');
+                overlay.remove();
+              };
+              overlay.querySelector('#cltur-welcome-close').addEventListener('click', close);
+            };
+            if (document.body) showNotice();
+            else document.addEventListener('DOMContentLoaded', showNotice, {once:true});
+          }
+        }
+        window.dispatchEvent(new Event('cltur-admin-ready')); return true;
       }catch(error){
         console.error('CL TUR auth error:',error);
         const detail=error?.message||error?.details||'Erro desconhecido';
@@ -821,6 +854,16 @@ html,body,.main{background:#edf2f8!important;color:#20344f!important}
 <style id="cltur-sidebar-logo-style">
 .cltur-sidebar-logo{width:36px!important;height:36px!important;min-width:36px;object-fit:contain!important;border-radius:8px!important;background:#fff;padding:2px;box-shadow:0 2px 7px rgba(31,55,88,.12)}
 .brand{gap:9px!important}
+</style>
+<style id="cltur-layout-welcome-style">
+#cltur-layout-welcome{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(17,35,59,.58);backdrop-filter:blur(5px)}
+.cltur-welcome-card{width:min(440px,100%);padding:32px 28px 26px;border:1px solid #dce7f4;border-radius:22px;background:linear-gradient(145deg,#fff,#f4f8fd);box-shadow:0 24px 70px rgba(12,35,65,.28);text-align:center;color:#20344f}
+.cltur-welcome-icon{width:62px;height:62px;margin:0 auto 16px;display:grid;place-items:center;border-radius:19px;background:#e7f0fc;font-size:30px}
+.cltur-welcome-tag{font-size:11px;letter-spacing:1.7px;font-weight:800;color:#3474bd}
+.cltur-welcome-card h2{margin:10px 0 12px;font-size:25px;line-height:1.2;color:#18385f}
+.cltur-welcome-card p{margin:10px 0;color:#536780;font-size:14px;line-height:1.65}
+#cltur-welcome-close{width:100%;margin-top:15px;border:0;border-radius:12px;padding:14px 18px;background:linear-gradient(135deg,#245ba8,#3479d0);color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 5px 14px rgba(36,91,168,.2)}
+@media(max-width:480px){.cltur-welcome-card{padding:27px 21px 22px}.cltur-welcome-card h2{font-size:22px}}
 </style>
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img class="cltur-sidebar-logo" src="./icons/cltur-logo.png" alt="Logo CL TUR"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button><button data-page="trash">🗑️ Lixeira</button><button data-page="archive">📁 Arquivo</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
