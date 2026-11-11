@@ -758,21 +758,92 @@ input:focus,select:focus,textarea:focus{border-color:#80aef2!important;box-shado
 }
 </style>
 
+
+<style id="cltur-login-premium">
+#cltur-auth-screen{background:radial-gradient(circle at 12% 15%,#e4efff 0,transparent 34%),linear-gradient(135deg,#f5f8fc,#edf3fb)!important;padding:24px!important}
+.cltur-auth-card{display:grid!important;grid-template-columns:minmax(260px,.88fr) minmax(340px,1.12fr)!important;width:min(900px,100%)!important;max-height:calc(100vh - 48px)!important;overflow:auto!important;padding:0!important;border:1px solid #e1eaf5!important;border-radius:25px!important;box-shadow:0 28px 80px rgba(31,61,101,.15)!important}
+.cltur-login-welcome{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;min-height:540px;padding:48px 42px;color:#fff;background:linear-gradient(145deg,#143d70 0%,#2368bd 58%,#4388e8 100%)}
+.cltur-login-welcome:before,.cltur-login-welcome:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.13);border-radius:50%;pointer-events:none}
+.cltur-login-welcome:before{width:360px;height:360px;right:-190px;top:-110px}
+.cltur-login-welcome:after{width:260px;height:260px;right:-120px;bottom:-130px}
+.cltur-login-mark{display:grid;place-items:center;width:66px;height:66px;border:1px solid rgba(255,255,255,.24);border-radius:19px;background:rgba(255,255,255,.13);font-size:32px;margin-bottom:22px;box-shadow:0 12px 28px rgba(8,31,66,.14)}
+.cltur-login-brand{font-size:32px;font-weight:900;letter-spacing:.08em;line-height:1.1}
+.cltur-login-tag{font-size:10px;letter-spacing:.22em;font-weight:800;color:#d9eaff;margin-top:8px}
+.cltur-login-divider{width:48px;height:3px;border-radius:5px;background:#b9d7ff;margin:30px 0 24px}
+.cltur-login-welcome h1{font-size:29px;line-height:1.2;letter-spacing:-.7px;margin:0 0 14px;color:#fff}
+.cltur-login-welcome p{max-width:300px;color:#e0edff;font-size:14px;line-height:1.7;margin:0}
+.cltur-login-foot{position:absolute;bottom:30px;left:42px;color:#c9ddf7;font-size:9px;letter-spacing:.2em;font-weight:800}
+.cltur-login-form-area{padding:56px 54px 42px;display:flex;flex-direction:column;justify-content:center;background:#fff;min-width:0}
+.cltur-login-mobile-brand{display:none}
+.cltur-login-kicker{font-size:10px;letter-spacing:.16em;font-weight:850;color:#3478d5;margin-bottom:10px}
+.cltur-login-form-area h2{font-size:28px;letter-spacing:-.7px;color:#1c3556;margin:0 0 8px}
+.cltur-login-instruction{color:#78889d;font-size:14px;margin:0 0 28px}
+.cltur-login-form-area label{display:block!important;margin:16px 0 8px!important;color:#344b68!important;font-size:12px!important;font-weight:750!important}
+.cltur-login-input-wrap{display:flex;align-items:center;gap:10px;width:100%;min-height:51px;padding:0 13px;border:1px solid #dce6f1;border-radius:12px;background:#fbfdff;transition:.18s}
+.cltur-login-input-wrap:focus-within{border-color:#7eabe9;box-shadow:0 0 0 4px rgba(49,117,205,.09);background:#fff}
+.cltur-login-input-wrap>span{font-size:15px;color:#7890ac;flex:none}
+.cltur-login-input-wrap input{width:100%!important;min-width:0!important;min-height:48px!important;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;padding:10px 0!important;font-size:14px!important}
+.cltur-login-input-wrap input:focus{box-shadow:none!important}
+.cltur-password-toggle{border:0;background:transparent;color:#3478d5;font-size:11px;font-weight:800;padding:8px 2px;cursor:pointer;flex:none}
+#cltur-auth-btn{display:flex!important;align-items:center!important;justify-content:space-between!important;width:100%!important;min-height:51px!important;margin-top:26px!important;padding:0 18px!important;border:0!important;border-radius:12px!important;background:linear-gradient(110deg,#2563c9,#3981e5)!important;color:#fff!important;font-size:14px!important;font-weight:800!important;box-shadow:0 9px 20px rgba(37,99,201,.2)!important;cursor:pointer}
+#cltur-auth-btn span:last-child{font-size:22px;font-weight:400;transition:transform .18s}
+#cltur-auth-btn:hover span:last-child{transform:translateX(3px)}
+#cltur-auth-btn:disabled{opacity:.65;cursor:wait}
+.cltur-login-secure{margin-top:18px;color:#8a99ad;font-size:10px;line-height:1.5;text-align:center}
+#cltur-auth-error{margin-top:16px}
+@media(max-width:700px){
+ #cltur-auth-screen{padding:14px!important;align-items:center!important}
+ .cltur-auth-card{display:block!important;width:min(440px,100%)!important;max-height:calc(100vh - 28px)!important;border-radius:21px!important}
+ .cltur-login-welcome{display:none!important}
+ .cltur-login-form-area{padding:34px 26px 28px!important}
+ .cltur-login-mobile-brand{display:flex;align-items:center;gap:10px;margin-bottom:30px;color:#1d4f91;font-size:21px}
+ .cltur-login-mobile-brand span{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#edf4ff;font-size:22px}
+ .cltur-login-form-area h2{font-size:25px}
+ .cltur-login-instruction{margin-bottom:20px}
+}
+@media(max-width:360px){.cltur-login-form-area{padding:26px 19px 22px!important}}
+</style>
+
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button><button data-page="trash">🗑️ Lixeira</button><button data-page="archive">📁 Arquivo</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
 <div id="cltur-auth-screen">
   <form class="cltur-auth-card" id="cltur-auth-form">
-    <div class="cltur-auth-brand">CL TUR</div>
-    <div class="cltur-auth-sub">Acesso ao sistema administrativo</div>
-    <label for="cltur-email">E-mail</label>
-    <input id="cltur-email" type="email" autocomplete="username" placeholder="seu@email.com" required>
-    <label for="cltur-password">Senha</label>
-    <input id="cltur-password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
-    <button id="cltur-auth-btn" type="submit">Entrar</button>
-    <div id="cltur-auth-error" class="cltur-auth-error"></div>
+    <section class="cltur-login-welcome">
+      <div class="cltur-login-mark" aria-hidden="true">🚌</div>
+      <div class="cltur-login-brand">CL TUR</div>
+      <div class="cltur-login-tag">TRANSPORTE & TURISMO</div>
+      <div class="cltur-login-divider"></div>
+      <h1>Gestão simples.<br>Viagens bem organizadas.</h1>
+      <p>Seu espaço para acompanhar excursões, fretamentos e operações da CL TUR.</p>
+      <div class="cltur-login-foot">PLATAFORMA DE GESTÃO</div>
+    </section>
+    <section class="cltur-login-form-area">
+      <div class="cltur-login-mobile-brand"><span>🚌</span><b>CL TUR</b></div>
+      <div class="cltur-login-kicker">BEM-VINDO DE VOLTA</div>
+      <h2>Acesse sua conta</h2>
+      <p class="cltur-login-instruction">Entre com seus dados para continuar.</p>
+      <label for="cltur-email">E-mail</label>
+      <div class="cltur-login-input-wrap"><span aria-hidden="true">✉</span><input id="cltur-email" type="email" autocomplete="username" placeholder="seu@email.com" required></div>
+      <label for="cltur-password">Senha</label>
+      <div class="cltur-login-input-wrap"><span aria-hidden="true">🔒</span><input id="cltur-password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required><button class="cltur-password-toggle" type="button" onclick="toggleClturPassword()" aria-label="Mostrar ou ocultar senha">Mostrar</button></div>
+      <button id="cltur-auth-btn" type="submit"><span>Entrar no sistema</span><span aria-hidden="true">→</span></button>
+      <div class="cltur-login-secure">🔐 Acesso protegido · Use seu e-mail e senha cadastrados</div>
+      <div id="cltur-auth-error" class="cltur-auth-error"></div>
+    </section>
   </form>
 </div>
+<script>
+function toggleClturPassword(){
+ const field=document.getElementById('cltur-password');
+ const toggle=document.querySelector('.cltur-password-toggle');
+ if(!field||!toggle)return;
+ const showing=field.type==='password';
+ field.type=showing?'text':'password';
+ toggle.textContent=showing?'Ocultar':'Mostrar';
+ toggle.setAttribute('aria-label',showing?'Ocultar senha':'Mostrar senha');
+}
+</script>
 <button id="cltur-logout" type="button" style="display:none">Sair</button>
 <script>
 // Referências explícitas ao DOM para garantir que o Dashboard seja renderizado no carregamento/recarregamento.
