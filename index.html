@@ -714,6 +714,50 @@ table.table { width: 100%; }
  .freight-mobile-card{width:100%;box-sizing:border-box}
 }
 </style>
+
+<style id="cltur-20-light-theme">
+:root{--blue:#2563eb;--blue2:#3b82f6;--navy:#16345c;--bg:#f5f8fc;--text:#182b45;--muted:#718096;--border:#e4ebf4;--green:#16845b;--red:#d64545}
+html,body{background:#f5f8fc!important;color:#182b45!important}
+body{font-family:Inter,"Segoe UI",Arial,sans-serif!important}
+.side{background:#fff!important;color:#243b5a!important;border-right:1px solid #e5ebf3!important;box-shadow:4px 0 22px rgba(28,52,84,.045)!important}
+.brand{border-bottom:1px solid #e9eef5!important}
+.brand b{color:#17365d!important}.brand small{color:#8291a5!important}
+.nav button{color:#52657e!important;background:transparent!important;border-radius:11px!important;font-weight:650!important;transition:background .18s,color .18s!important}
+.nav button:hover{background:#f0f5fc!important;color:#1d4f91!important;transform:none!important}
+.nav button.active{background:#eaf2ff!important;color:#1d5fc4!important;box-shadow:inset 3px 0 #3478df!important}
+.main{background:#f5f8fc!important}
+.top{background:#fff!important;border:1px solid #e6edf5!important;box-shadow:0 5px 20px rgba(31,55,88,.045)!important;border-radius:17px!important}
+.top h1{color:#1b3556!important}
+.top.dashboard-head{background:linear-gradient(120deg,#fff 0%,#f2f7ff 100%)!important;border:1px solid #e2ebf7!important;box-shadow:0 8px 24px rgba(31,78,135,.07)!important;color:#1b3556!important}
+.top.dashboard-head:after{background:rgba(59,130,246,.07)!important}
+.top.dashboard-head h1,.top.dashboard-head .admin-subtitle{color:#1b3556!important}
+.top.dashboard-head .admin-eyebrow{color:#2563eb!important}
+.final-hero{background:linear-gradient(120deg,#fff,#f4f8ff)!important;border:1px solid #e3ebf5!important;border-radius:16px!important;padding:20px!important;margin-bottom:18px!important;box-shadow:0 5px 18px rgba(31,55,88,.04)!important}
+.final-hero h2{color:#1d385b!important}.final-hero p{color:#718096!important}
+.card,.panel{background:#fff!important;border-color:#e4ebf4!important;box-shadow:0 5px 20px rgba(31,55,88,.045)!important}
+.card:hover{box-shadow:0 10px 25px rgba(31,55,88,.075)!important}
+.card small,.muted{color:#718096!important}.card strong,.panel h2{color:#1b3556!important}
+.table th{background:#f5f8fc!important;color:#687b93!important}
+.table td,.table th{border-bottom-color:#edf1f6!important}
+.btn{background:linear-gradient(135deg,#2563eb,#4388ed)!important;color:#fff!important;box-shadow:0 4px 11px rgba(37,99,235,.14)!important}
+.btn.secondary{background:#edf3fa!important;color:#36516f!important;box-shadow:none!important}
+.btn.danger{background:#d94848!important;color:#fff!important;box-shadow:none!important}
+input,select,textarea,.field input,.field select,.field textarea{background:#fff!important;color:#263b56!important;border-color:#dce5ef!important}
+input:focus,select:focus,textarea:focus{border-color:#80aef2!important;box-shadow:0 0 0 3px rgba(37,99,235,.09)!important}
+.modalbox{background:#fff!important;border:1px solid #e4ebf4!important;box-shadow:0 20px 60px rgba(26,48,78,.16)!important}
+#cltur-auth-screen{background:linear-gradient(135deg,#f5f8fc,#eaf2fc)!important}
+.cltur-auth-card{border-color:#e3ebf5!important;box-shadow:0 18px 50px rgba(31,55,88,.10)!important}
+#cltur-logout{background:#fff!important;color:#315273!important;border:1px solid #dfe8f2!important;box-shadow:0 4px 16px rgba(31,55,88,.10)!important}
+@media(max-width:760px){
+ .side{background:#fff!important;border-bottom:1px solid #e4ebf4!important;box-shadow:0 3px 14px rgba(31,55,88,.04)!important}
+ .side.cltur-menu-open .nav{background:#fff!important;border:1px solid #e4ebf4!important;box-shadow:0 12px 28px rgba(31,55,88,.12)!important}
+ .side.cltur-menu-open .nav button{color:#52657e!important}
+ .side.cltur-menu-open .nav button.active{color:#1d5fc4!important;background:#eaf2ff!important}
+ .main{background:#f5f8fc!important}
+ .top,.final-hero{border-radius:13px!important}
+}
+</style>
+
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img src="/mnt/data/870982.jpg" onerror="this.style.display='none'"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button><button data-page="trash">🗑️ Lixeira</button><button data-page="archive">📁 Arquivo</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
