@@ -865,6 +865,30 @@ html,body,.main{background:#edf2f8!important;color:#20344f!important}
 #cltur-welcome-close{width:100%;margin-top:15px;border:0;border-radius:12px;padding:14px 18px;background:linear-gradient(135deg,#245ba8,#3479d0);color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 5px 14px rgba(36,91,168,.2)}
 @media(max-width:480px){.cltur-welcome-card{padding:27px 21px 22px}.cltur-welcome-card h2{font-size:22px}}
 </style>
+<style id="cltur-status-pill-fix">
+/* Statuses de excursões: etiquetas compactas, sem esticar ou virar círculos */
+.trip-card .pill,
+.trip-mobile-card .pill,
+.trip-mobile-head .pill,
+.trip-card-grid .pill{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  align-self:flex-start!important;
+  width:max-content!important;
+  min-width:0!important;
+  max-width:max-content!important;
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:auto!important;
+  padding:6px 11px!important;
+  border-radius:999px!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  font-size:12px!important;
+}
+</style>
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img class="cltur-sidebar-logo" src="./icons/cltur-logo.png" alt="Logo CL TUR"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button><button data-page="trash">🗑️ Lixeira</button><button data-page="archive">📁 Arquivo</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
