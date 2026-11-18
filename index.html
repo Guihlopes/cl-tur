@@ -915,6 +915,35 @@ html,body,.main{background:#edf2f8!important;color:#20344f!important}
   transform:none!important;
 }
 </style>
+<style id="cltur-tablet-modal-scroll-fix">
+/* Formulários longos: início visível e rolagem dentro do modal em celular/tablet */
+@media(max-width:900px){
+  #modal.modal{
+    align-items:flex-start!important;
+    justify-content:center!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding:12px!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  #modal.modal .modalbox{
+    width:100%!important;
+    max-width:760px!important;
+    max-height:calc(100dvh - 24px)!important;
+    margin:0 auto!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    border-radius:18px!important;
+    padding:18px 14px 24px!important;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+}
+@media(max-width:480px){
+  #modal.modal{padding:8px!important}
+  #modal.modal .modalbox{max-height:calc(100dvh - 16px)!important;padding:15px 12px 22px!important}
+}
+</style>
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img class="cltur-sidebar-logo" src="./icons/cltur-logo.png" alt="Logo CL TUR"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button><button data-page="trash">🗑️ Lixeira</button><button data-page="archive">📁 Arquivo</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
@@ -1057,7 +1086,15 @@ function occupied(tid){return data.people.filter(p=>p.tripId==tid&&p.seat).lengt
 function seatTaken(tid,vehicleIndex,seat,ignoreId=''){return data.people.some(p=>p.tripId==tid&&p.id!=ignoreId&&Number(p.vehicleIndex||0)===Number(vehicleIndex)&&String(p.seat||'')===String(seat))}
 function vehicleLabel(v,i){return `${v.type||'Veículo'} ${i+1}`}
 function assignedPassenger(tid,vehicleIndex,seat){return data.people.find(p=>p.tripId==tid&&Number(p.vehicleIndex||0)===Number(vehicleIndex)&&String(p.seat||'')===String(seat))}
-function openModal(html){modal.innerHTML='<div class="modalbox">'+html+'</div>';modal.classList.remove('hidden')}
+function openModal(html){
+  modal.innerHTML='<div class="modalbox">'+html+'</div>';
+  modal.classList.remove('hidden');
+  // Garante que formulários longos sempre abram pelo início, inclusive em tablets.
+  modal.scrollTop=0;
+  const box=modal.querySelector('.modalbox');
+  if(box) box.scrollTop=0;
+  requestAnimationFrame(()=>{modal.scrollTop=0;if(box)box.scrollTop=0});
+}
 function closeModal(){modal.classList.add('hidden');modal.innerHTML=''}
 modal.addEventListener('click',e=>{if(e.target===modal)closeModal()})
 function layout(title,body,action=''){let dash=title==='Dashboard';return `<div class="top ${dash?'dashboard-head':''}"><div><div class="admin-eyebrow">CL TUR • Painel administrativo</div><h1>${title}</h1><p class="admin-subtitle">${dash?'Gerencie excursões, passageiros, fretamentos e financeiro em um só lugar.':'Controle e organize as operações da CL TUR.'}</p></div>${action}</div>${body}`}
