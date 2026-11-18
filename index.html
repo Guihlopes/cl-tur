@@ -1860,7 +1860,7 @@ if ('serviceWorker' in navigator) {
     });
     side.insertBefore(btn,nav);
     nav.addEventListener('click',function(e){
-      if(e.target.closest('button') && window.matchMedia('(max-width: 760px)').matches){
+      if(e.target.closest('button') && window.matchMedia('(max-width: 900px)').matches){
         side.classList.remove('cltur-menu-open');btn.setAttribute('aria-expanded','false');
       }
     });
