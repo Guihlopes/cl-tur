@@ -1071,7 +1071,7 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif!important;letter-spacing:.005
 @media(max-width:640px){.cltur-operations-stats{grid-template-columns:1fr 1fr}.cltur-operations-stats>div:last-child{grid-column:1/-1}.cltur-attention-item{align-items:flex-start;flex-direction:column}.cltur-attention-actions{width:100%}.cltur-attention-actions .btn{flex:1}}
 </style>
 <style id="cltur-30-passenger-followup">
-.cltur-passenger-kpis{grid-template-columns:repeat(3,minmax(0,1fr));margin:12px 0}
+.cltur-payment-kpis{grid-template-columns:repeat(3,minmax(0,1fr));margin:12px 0}
 .cltur-passenger-tools{display:flex;flex-direction:column;gap:10px;margin:12px 0 16px}
 .cltur-passenger-tools input{width:100%;max-width:420px;padding:11px 13px;border:1px solid #d8e1eb;border-radius:10px;font:inherit}
 .cltur-passenger-tools .action-buttons{display:flex;flex-wrap:wrap;gap:7px}
@@ -1572,7 +1572,7 @@ function peopleDetail(tid){
   const pendingCount=ps.filter(p=>paymentStatus(p)==='Pendente').length;
   const rows=ps.map(p=>{
     const pp=paymentTotal(p),pend=Math.max(0,Number(p.value||0)-pp),st=paymentStatus(p);
-    const phone=String(p.phone||'').replace(/\\D/g,'');
+    const phone=String(p.phone||'').replace(/[^0-9]/g,'');
     const whatsapp=phone.length>=10?(phone.startsWith('55')?phone:'55'+phone):'';
     const message=encodeURIComponent('Olá, '+p.name+'! Tudo bem? Estamos entrando em contato sobre o pagamento da excursão '+t.destination+'. Consta um saldo de '+money(pend)+'. Qualquer dúvida, estamos à disposição!');
     return `<tr data-payment-status="${st}"><td><b>${esc(p.name)}</b><br><small>${esc(p.phone||'')}</small></td><td>${esc(p.cpf||'—')}</td><td>${esc(p.rg||'—')}</td><td>${p.seat?`💺 ${esc(p.seat)}`:'—'}</td><td>${money(p.value)}</td><td>${money(pp)}</td><td>${money(pend)}</td><td><span class="pill ${st==='Confirmado'?'ok':st==='Parcial'?'warn':''}">${st}</span></td><td><div class="action-buttons">${whatsapp&&pend>0?`<a class="btn secondary" href="https://wa.me/${whatsapp}?text=${message}" target="_blank" rel="noopener">WhatsApp</a>`:''}<button class="btn secondary" onclick="paymentForm('${p.id}')">💳 Pagamentos</button><button class="btn secondary" onclick="personForm('${p.id}')">Editar</button><button class="btn danger" onclick="delPerson('${p.id}');peopleDetail('${tid}')">Excluir</button></div></td></tr>`;
