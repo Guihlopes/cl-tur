@@ -1039,6 +1039,17 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif!important;letter-spacing:.005
  .card:hover,.btn:hover{transform:none!important}
 }
 </style>
+<style id="cltur-30-global-search">
+.cltur-top-tools{display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:min(420px,48%)}
+.cltur-global-search{display:flex;align-items:center;gap:8px;width:min(290px,100%);height:42px;padding:0 11px;border:1px solid #dbe4ef;border-radius:12px;background:#f8fafd;color:#64748b}
+.cltur-global-search>span{font-size:22px;line-height:1}
+.cltur-global-search input{width:100%;min-width:0;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;padding:0!important;min-height:34px!important;font-size:13px!important}
+.cltur-global-search kbd{white-space:nowrap;padding:3px 5px;border:1px solid #dce4ee;border-radius:5px;background:#fff;color:#7b8798;font-size:10px}
+.cltur-search-empty:after{content:"Nenhum resultado encontrado nesta lista.";display:block;padding:14px;color:#718096;font-size:13px}
+.top.dashboard-head .cltur-global-search{background:rgba(255,255,255,.96);border-color:rgba(255,255,255,.55)}
+@media(max-width:900px){.cltur-top-tools{min-width:0;flex-wrap:wrap;justify-content:flex-start}.cltur-global-search{width:min(100%,340px)}}
+@media(max-width:640px){.cltur-top-tools{width:100%}.cltur-global-search{width:100%}.top{align-items:flex-start!important;flex-direction:column!important}.top.dashboard-head{gap:14px!important}}
+</style>
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img class="cltur-sidebar-logo" src="./icons/cltur-logo.png" alt="Logo CL TUR"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button><button data-page="trash">🗑️ Lixeira</button><button data-page="archive">📁 Arquivo</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
@@ -1172,6 +1183,29 @@ function save(){
   }
 }
 window.addEventListener('cltur-admin-ready',loadCLTURCloudState);
+function filterCurrentView(value){
+  const q=String(value||'').trim().toLocaleLowerCase('pt-BR');
+  const selectors='.table tr:not(:first-child),.trip-mobile-card,.trip-card,.public-trip-card,.notification-item,.archive-item';
+  document.querySelectorAll(selectors).forEach(el=>{
+    const match=!q||el.textContent.toLocaleLowerCase('pt-BR').includes(q);
+    el.style.display=match?'':'none';
+  });
+  document.querySelectorAll('.trip-card-grid,.trips-mobile-list,.dashboard-upcoming-mobile').forEach(container=>{
+    const items=container.querySelectorAll('.trip-card,.trip-mobile-card,.dashboard-upcoming-card');
+    if(items.length) container.classList.toggle('cltur-search-empty',!!q&&!Array.from(items).some(el=>el.style.display!=='none'));
+  });
+}
+(function(){
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){
+      const input=document.querySelector('.cltur-global-search input');
+      if(input){e.preventDefault();input.focus();input.select();}
+    }
+    if(e.key==='Escape'&&document.activeElement?.matches('.cltur-global-search input')){
+      document.activeElement.value='';filterCurrentView('');
+    }
+  });
+})();
 function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function fmt(d){if(!d)return '-';let [y,m,day]=d.split('-');return `${day}/${m}/${y}`}
@@ -1192,7 +1226,7 @@ function openModal(html){
 }
 function closeModal(){modal.classList.add('hidden');modal.innerHTML=''}
 modal.addEventListener('click',e=>{if(e.target===modal)closeModal()})
-function layout(title,body,action=''){let dash=title==='Dashboard';return `<div class="top ${dash?'dashboard-head':''}"><div><div class="admin-eyebrow">CL TUR • Painel administrativo</div><h1>${title}</h1><p class="admin-subtitle">${dash?'Gerencie excursões, passageiros, fretamentos e financeiro em um só lugar.':'Controle e organize as operações da CL TUR.'}</p></div>${action}</div>${body}`}
+function layout(title,body,action=''){let dash=title==='Dashboard';return `<div class="top ${dash?'dashboard-head':''}"><div><div class="admin-eyebrow">CL TUR • Painel administrativo</div><h1>${title}</h1><p class="admin-subtitle">${dash?'Gerencie excursões, passageiros, fretamentos e financeiro em um só lugar.':'Controle e organize as operações da CL TUR.'}</p></div><div class="cltur-top-tools"><label class="cltur-global-search"><span>⌕</span><input type="search" placeholder="Buscar nesta tela…" aria-label="Buscar nesta tela" oninput="filterCurrentView(this.value)"><kbd>Ctrl K</kbd></label>${action}</div></div>${body}`}
 
 let clturPortalSyncRunning=false;
 async function syncPortalFreightRequests(){
