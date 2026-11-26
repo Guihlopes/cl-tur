@@ -1100,22 +1100,57 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif!important;letter-spacing:.005
 #cltur-splash video{width:100%;height:100%;object-fit:cover}
 @media (max-aspect-ratio: 3/4){#cltur-splash video{object-fit:contain}}
 </style>
+<style>
+#cltur-splash-start{position:absolute;left:50%;bottom:max(34px,env(safe-area-inset-bottom));transform:translateX(-50%);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:13px 23px;background:rgba(7,24,48,.82);color:#fff;font:700 14px Arial,sans-serif;letter-spacing:.03em;display:none;z-index:2}
+#cltur-splash.cltur-splash-needs-tap #cltur-splash-start{display:block}
+</style>
 <script>
 (function(){
   const splash=document.getElementById('cltur-splash');
   const video=document.getElementById('cltur-splash-video');
   if(!splash||!video)return;
-  let closed=false;
+  let closed=false,started=false;
   function closeSplash(){
     if(closed)return; closed=true;
     splash.classList.add('cltur-splash-hidden');
     setTimeout(()=>splash.remove(),650);
   }
+  function startVideo(){
+    if(started||closed)return;
+    started=true;
+    splash.classList.remove('cltur-splash-needs-tap');
+    const p=video.play();
+    if(p&&p.catch)p.catch(()=>{
+      started=false;
+      splash.classList.add('cltur-splash-needs-tap');
+      startButton.textContent='Toque para reproduzir';
+    });
+  }
+  const startButton=document.createElement('button');
+  startButton.id='cltur-splash-start';
+  startButton.type='button';
+  startButton.textContent='▶ Toque para iniciar';
+  startButton.addEventListener('click',startVideo);
+  splash.appendChild(startButton);
   video.addEventListener('ended',closeSplash,{once:true});
-  video.addEventListener('error',closeSplash,{once:true});
-  setTimeout(closeSplash,7500);
-  const playPromise=video.play();
-  if(playPromise&&playPromise.catch)playPromise.catch(closeSplash);
+  video.addEventListener('error',()=>{
+    startButton.textContent='Continuar para o login';
+    startButton.onclick=closeSplash;
+    splash.classList.add('cltur-splash-needs-tap');
+  },{once:true});
+  setTimeout(()=>{
+    if(!closed){
+      startButton.textContent='Continuar para o login';
+      startButton.onclick=closeSplash;
+      splash.classList.add('cltur-splash-needs-tap');
+    }
+  },15000);
+  video.muted=true;
+  video.playsInline=true;
+  video.setAttribute('muted','');
+  video.setAttribute('playsinline','');
+  video.load();
+  startVideo();
 })();
 </script>
 <div class="app"><aside class="side"><div class="brand"><img class="cltur-sidebar-logo" src="./icons/cltur-logo.png" alt="Logo CL TUR"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button><button data-page="trash">🗑️ Lixeira</button><button data-page="archive">📁 Arquivo</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
