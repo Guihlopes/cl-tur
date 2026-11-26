@@ -944,6 +944,101 @@ html,body,.main{background:#edf2f8!important;color:#20344f!important}
   #modal.modal .modalbox{max-height:calc(100dvh - 16px)!important;padding:15px 12px 22px!important}
 }
 </style>
+<style id="cltur-30-premium-foundation">
+/* CL TUR 3.0 — camada visual. Não altera dados, eventos ou regras de negócio. */
+:root{
+ --cltur-navy:#102947;--cltur-navy-2:#173a63;--cltur-blue:#2f70c9;
+ --cltur-blue-soft:#eaf2fc;--cltur-canvas:#eef3f9;--cltur-surface:#fff;
+ --cltur-ink:#1b304b;--cltur-muted:#718198;--cltur-line:#dfe7f0;
+ --cltur-shadow:0 8px 24px rgba(21,48,82,.065);
+}
+html,body{background:var(--cltur-canvas)!important;color:var(--cltur-ink)!important}
+body{font-family:Inter,"Segoe UI",Arial,sans-serif!important;letter-spacing:.005em}
+.side{
+ background:linear-gradient(180deg,var(--cltur-navy) 0%,#0c2039 100%)!important;
+ color:#f4f8ff!important;border-right:1px solid rgba(255,255,255,.08)!important;
+ box-shadow:5px 0 28px rgba(11,31,55,.13)!important
+}
+.brand{border-bottom:1px solid rgba(255,255,255,.13)!important}
+.brand b{color:#fff!important;font-size:18px!important;letter-spacing:.035em}
+.brand small{color:#b8c9df!important;letter-spacing:.035em}
+.cltur-sidebar-logo{background:#fff!important;border:1px solid rgba(255,255,255,.22)!important}
+.nav button{
+ color:#c5d3e5!important;background:transparent!important;
+ border:1px solid transparent!important;border-radius:10px!important;
+ font-weight:600!important;transition:background .18s ease,color .18s ease,border-color .18s ease!important
+}
+.nav button:hover{background:rgba(255,255,255,.085)!important;color:#fff!important;border-color:rgba(255,255,255,.07)!important}
+.nav button.active{
+ background:linear-gradient(100deg,rgba(75,139,220,.28),rgba(75,139,220,.12))!important;
+ color:#fff!important;border-color:rgba(137,183,241,.2)!important;
+ box-shadow:inset 3px 0 #75adf4!important
+}
+.main{background:var(--cltur-canvas)!important}
+.top{
+ border:1px solid var(--cltur-line)!important;border-radius:16px!important;
+ background:var(--cltur-surface)!important;box-shadow:var(--cltur-shadow)!important;
+ padding:19px 22px!important;margin-bottom:20px!important
+}
+.top h1{color:var(--cltur-ink)!important;font-size:25px!important;font-weight:750!important;letter-spacing:-.025em}
+.top .admin-eyebrow{color:var(--cltur-blue)!important;font-size:10px!important;font-weight:800!important;letter-spacing:.13em!important;text-transform:uppercase!important}
+.top .admin-subtitle{color:var(--cltur-muted)!important}
+.top.dashboard-head{background:linear-gradient(115deg,#fff 0%,#f1f6fd 100%)!important;border-color:#dce7f4!important}
+.final-hero{
+ border:1px solid #dce7f4!important;border-radius:17px!important;
+ background:linear-gradient(115deg,#fff 0%,#f1f6fd 100%)!important;
+ box-shadow:var(--cltur-shadow)!important
+}
+.final-hero h2,.panel h2{color:var(--cltur-ink)!important;font-weight:750!important;letter-spacing:-.015em}
+.card,.panel{
+ background:var(--cltur-surface)!important;border:1px solid var(--cltur-line)!important;
+ border-radius:15px!important;box-shadow:var(--cltur-shadow)!important
+}
+.card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease!important}
+.card:hover{transform:translateY(-2px);border-color:#cbd9e9!important;box-shadow:0 13px 28px rgba(21,48,82,.09)!important}
+.card small,.muted{color:var(--cltur-muted)!important}
+.card strong{color:var(--cltur-ink)!important;font-weight:780!important;letter-spacing:-.025em}
+.table{border-collapse:separate!important;border-spacing:0!important}
+.table th{background:#f3f6fa!important;color:#65768d!important;font-size:11px!important;font-weight:800!important;letter-spacing:.055em!important;text-transform:uppercase!important}
+.table th:first-child{border-top-left-radius:8px}
+.table th:last-child{border-top-right-radius:8px}
+.table td{color:#344860!important}
+.table td,.table th{border-bottom:1px solid #e9eef4!important}
+.btn{
+ border-radius:10px!important;font-weight:700!important;letter-spacing:.005em!important;
+ transition:transform .15s ease,filter .15s ease,box-shadow .15s ease!important
+}
+.btn:not(.secondary):not(.danger){background:linear-gradient(135deg,#245ba8,#397fd4)!important;box-shadow:0 5px 13px rgba(36,91,168,.18)!important}
+.btn:hover{filter:brightness(1.035);transform:translateY(-1px)}
+.btn.secondary{background:#edf2f8!important;color:#38516f!important;border:1px solid #e0e8f1!important;box-shadow:none!important}
+.btn.danger{background:#c94343!important;color:#fff!important}
+.field input,.field select,.field textarea,input,select,textarea{
+ border-radius:9px!important;border-color:#d8e2ed!important
+}
+.field label{color:#526780!important;font-weight:700!important}
+.pill{font-weight:700!important;letter-spacing:.01em}
+.modalbox{border:1px solid #dce5ef!important;border-radius:17px!important;box-shadow:0 22px 65px rgba(12,34,61,.2)!important}
+#cltur-logout{border-radius:11px!important}
+#cltur-menu-toggle{background:rgba(255,255,255,.1)!important;color:#fff!important;border:1px solid rgba(255,255,255,.2)!important}
+@media(max-width:900px){
+ .side{background:linear-gradient(180deg,var(--cltur-navy) 0%,#0c2039 100%)!important;border-bottom:1px solid rgba(255,255,255,.13)!important}
+ .brand{border-bottom-color:rgba(255,255,255,.13)!important}
+ .side.cltur-menu-open .nav{background:#122d4d!important;border:1px solid rgba(255,255,255,.13)!important;box-shadow:0 12px 28px rgba(5,20,39,.25)!important}
+ .side.cltur-menu-open .nav button{color:#c5d3e5!important}
+ .side.cltur-menu-open .nav button.active{background:rgba(75,139,220,.22)!important;color:#fff!important}
+ .main{background:var(--cltur-canvas)!important}
+}
+@media(max-width:760px){
+ .top{padding:15px!important;margin-bottom:14px!important}
+ .top h1{font-size:21px!important}
+ .final-hero{padding:16px!important}
+ .card,.panel{border-radius:13px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .card,.btn,.nav button{transition:none!important}
+ .card:hover,.btn:hover{transform:none!important}
+}
+</style>
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img class="cltur-sidebar-logo" src="./icons/cltur-logo.png" alt="Logo CL TUR"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button><button data-page="trash">🗑️ Lixeira</button><button data-page="archive">📁 Arquivo</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
