@@ -1296,8 +1296,9 @@ function save(){
 window.addEventListener('cltur-admin-ready',loadCLTURCloudState);
 function filterCurrentView(value){
   const q=String(value||'').trim().toLocaleLowerCase('pt-BR');
-  const selectors='.table tr:not(:first-child),.trip-mobile-card,.trip-card,.public-trip-card,.notification-item,.archive-item';
+  const selectors='table tr,.trip-mobile-card,.trip-card,.public-trip-card,.notification-item,.archive-item,.dashboard-upcoming-card';
   document.querySelectorAll(selectors).forEach(el=>{
+    if(el.matches('tr')&&el.querySelector('th')){el.style.display='';return;}
     const match=!q||el.textContent.toLocaleLowerCase('pt-BR').includes(q);
     el.style.display=match?'':'none';
   });
