@@ -1912,7 +1912,55 @@ function calendarMove(n){data.calendarView=data.calendarView||{year:new Date().g
 function calendarToday(){const d=new Date();data.calendarView={year:d.getFullYear(),month:d.getMonth()};save();render('calendar')}
 function calendarSetMonth(v){data.calendarView=data.calendarView||{year:new Date().getFullYear(),month:new Date().getMonth()};data.calendarView.month=Number(v);save();render('calendar')}
 function calendarSetYear(v){data.calendarView=data.calendarView||{year:new Date().getFullYear(),month:new Date().getMonth()};data.calendarView.year=Number(v)||new Date().getFullYear();save();render('calendar')}
-function reports(){main.innerHTML=layout('Relatórios',`<div class="cards"><div class="card"><small>Excursões</small><strong>${data.trips.length}</strong></div><div class="card"><small>Passageiros</small><strong>${data.people.length}</strong></div><div class="card"><small>Fretamentos</small><strong>${data.charters.length}</strong></div><div class="card"><small>Publicadas</small><strong>${data.trips.filter(t=>t.published).length}</strong></div></div>`)}
+function reports(){
+  const peopleContract=data.people.reduce((a,p)=>a+Number(p.value||0),0);
+  const peoplePaid=data.people.reduce((a,p)=>a+paymentTotal(p),0);
+  const charterContract=data.charters.reduce((a,c)=>a+charterFinancialContract(c),0);
+  const charterPaid=data.charters.reduce((a,c)=>a+charterFinancialReceived(c),0);
+  const contracted=peopleContract+charterContract,received=peoplePaid+charterPaid;
+  const pending=Math.max(0,contracted-received);
+  const expenses=data.expenses.reduce((a,e)=>a+Number(e.value||0),0);
+  const result=received-expenses;
+  const tripRows=data.trips.slice().sort((a,b)=>(a.departure||'').localeCompare(b.departure||'')).map(t=>{
+    const ps=data.people.filter(p=>String(p.tripId)===String(t.id));
+    const total=totalSeats(t),occupiedCount=occupied(t.id),free=Math.max(0,total-occupiedCount);
+    const value=ps.reduce((a,p)=>a+Number(p.value||0),0);
+    const paid=ps.reduce((a,p)=>a+paymentTotal(p),0);
+    const cost=data.expenses.filter(e=>String(e.tripId)===String(t.id)&&!e.charterId).reduce((a,e)=>a+Number(e.value||0),0);
+    return '<tr><td><b>'+esc(t.destination)+'</b><br><small>'+fmt(t.departure)+'</small></td><td>'+ps.length+'</td><td>'+free+' / '+total+'</td><td>'+money(value)+'</td><td>'+money(paid)+'</td><td>'+money(Math.max(0,value-paid))+'</td><td class="'+(paid-cost>=0?'result-positive':'result-negative')+'"><b>'+money(paid-cost)+'</b></td></tr>';
+  }).join('');
+  const charterRows=data.charters.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(c=>{
+    const value=charterFinancialContract(c),paid=charterFinancialReceived(c);
+    const cost=data.expenses.filter(e=>String(e.charterId)===String(c.id)).reduce((a,e)=>a+Number(e.value||0),0);
+    return '<tr><td><b>'+esc(c.client||'Fretamento')+'</b><br><small>'+fmt(c.date)+' · '+esc(c.destination||'')+'</small></td><td>'+esc(c.status||'Aguardando fechamento')+'</td><td>'+money(value)+'</td><td>'+money(paid)+'</td><td>'+money(Math.max(0,value-paid))+'</td><td>'+money(cost)+'</td><td>'+(charterIsFinancial(c)?money(paid-cost):'—')+'</td></tr>';
+  }).join('');
+  main.innerHTML=layout('Relatórios',`
+    <div class="report-summary-strip">
+      <div><span>Receita contratada</span><b>${money(contracted)}</b></div>
+      <div><span>Recebido</span><b>${money(received)}</b></div>
+      <div><span>A receber</span><b>${money(pending)}</b></div>
+      <div><span>Despesas lançadas</span><b>${money(expenses)}</b></div>
+      <div><span>Resultado de caixa</span><b class="${result>=0?'result-positive':'result-negative'}">${money(result)}</b></div>
+    </div>
+    <div class="cards">
+      <div class="card"><small>Excursões ativas</small><strong>${data.trips.length}</strong></div>
+      <div class="card"><small>Passageiros cadastrados</small><strong>${data.people.length}</strong></div>
+      <div class="card"><small>Fretamentos</small><strong>${data.charters.length}</strong></div>
+      <div class="card"><small>Excursões publicadas</small><strong>${data.trips.filter(t=>t.published).length}</strong></div>
+    </div>
+    <div class="panel report-tables">
+      <h2>🚌 Desempenho das excursões</h2>
+      <p class="muted">Ocupação, valores contratados, recebimentos e resultado de caixa por excursão ativa.</p>
+      ${tripRows?`<div style="overflow:auto"><table class="table"><tr><th>Destino / saída</th><th>Passageiros</th><th>Vagas livres</th><th>Contratado</th><th>Recebido</th><th>A receber</th><th>Caixa após custos</th></tr>${tripRows}</table></div>`:'<div class="empty">Nenhuma excursão ativa para analisar.</div>'}
+    </div>
+    <div class="panel report-tables">
+      <h2>🚐 Desempenho dos fretamentos</h2>
+      <p class="muted">Orçamentos ainda não contratados não entram na receita contratada.</p>
+      ${charterRows?`<div style="overflow:auto"><table class="table"><tr><th>Cliente / serviço</th><th>Status</th><th>Contratado</th><th>Recebido</th><th>A receber</th><th>Custos</th><th>Resultado</th></tr>${charterRows}</table></div>`:'<div class="empty">Nenhum fretamento cadastrado.</div>'}
+    </div>
+    <p class="muted">Relatório calculado com os registros ativos atualmente carregados. Itens arquivados e excluídos permanecem em suas respectivas áreas.</p>
+  `);
+}
 function publicPage(){let pub=data.trips.filter(t=>t.published);let cards=pub.map(t=>`<article class="card public-trip-card">${t.image?`<img class="public-trip-cover" src="${t.image}" alt="Arte de ${esc(t.destination)}">`:'<div class="public-trip-empty-cover">🚌</div>'}<div class="public-trip-body"><div class="public-preview-head"><div><small>${fmt(t.departure)}${t.returnDate?' → '+fmt(t.returnDate):''}</small><h2 style="margin:5px 0 0">${esc(t.destination)}</h2></div><span class="pill ok">Publicado</span></div><p class="muted">📍 ${esc(t.origin||'A confirmar')}</p><div class="public-trip-meta"><span>💰 ${money(t.price)}/pessoa</span><span>👥 ${Math.max(0,totalSeats(t)-occupied(t.id))} vagas</span><span>🚌 ${(t.vehicles||[]).map(v=>esc(v.type)).join(' + ')}</span></div><p class="muted">${esc(t.notes||'Excursão publicada na área do cliente.')}</p><button class="btn" onclick="reserve('${t.id}')">Ver detalhes e reservar →</button></div></article>`).join('');main.innerHTML=layout('Área do cliente',`<div class="panel"><div class="public-preview-head"><div><div class="admin-eyebrow">PRÉ-VISUALIZAÇÃO</div><h2 style="margin:4px 0">Área do cliente</h2><p class="muted">Veja como as excursões publicadas aparecem para os clientes.</p></div><span class="mini-pill">🌐 ${pub.length} publicada${pub.length===1?'':'s'}</span></div></div>${cards?`<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:stretch">${cards}</div>`:'<div class="panel"><div class="empty">Nenhuma excursão publicada no momento.</div></div>'}`)}
 function getNotifications(){try{return JSON.parse(localStorage.getItem('cltur_notifications_v1')||'[]')}catch(e){return []}}
 function addNotification(n){const list=getNotifications();if(list.some(x=>x.key===n.key))return;list.unshift({...n,key:n.key,id:Date.now().toString()+Math.random(),createdAt:new Date().toISOString(),read:false});localStorage.setItem('cltur_notifications_v1',JSON.stringify(list.slice(0,100)));updateNotificationBadge()}
