@@ -1,5 +1,11 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8">
+<html lang="pt-BR"><head>
+<script>document.documentElement.classList.add('cltur-starting');</script>
+<style>
+html.cltur-starting #cltur-auth-screen{visibility:hidden!important;pointer-events:none!important}
+#cltur-splash{z-index:2147483647!important}
+</style>
+<meta charset="utf-8">
 <meta name="theme-color" content="#f5f8fc">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1112,6 +1118,7 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif!important;letter-spacing:.005
   let closed=false,started=false;
   function closeSplash(){
     if(closed)return; closed=true;
+    document.documentElement.classList.remove('cltur-starting');
     splash.classList.add('cltur-splash-hidden');
     setTimeout(()=>splash.remove(),650);
   }
