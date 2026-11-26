@@ -1050,6 +1050,26 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif!important;letter-spacing:.005
 @media(max-width:900px){.cltur-top-tools{min-width:0;flex-wrap:wrap;justify-content:flex-start}.cltur-global-search{width:min(100%,340px)}}
 @media(max-width:640px){.cltur-top-tools{width:100%}.cltur-global-search{width:100%}.top{align-items:flex-start!important;flex-direction:column!important}.top.dashboard-head{gap:14px!important}}
 </style>
+<style id="cltur-30-operations-center">
+.cltur-occupancy-track{display:block;width:100%;height:6px;margin-top:6px;overflow:hidden;border-radius:99px;background:#e7edf5}
+.cltur-occupancy-track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#4b8ce8,#153e70)}
+.dashboard-upcoming-meta .cltur-occupancy-track{grid-column:1/-1}
+.cltur-operations-panel{border:1px solid #dce6f1}
+.cltur-operations-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+.cltur-operations-stats>div{display:flex;flex-direction:column;gap:4px;padding:13px 15px;border-radius:12px;background:#f3f6fa}
+.cltur-operations-stats b{font-size:23px;color:#183b61}
+.cltur-operations-stats span{font-size:12px;color:#65758b}
+.cltur-attention-list{display:flex;flex-direction:column;gap:9px}
+.cltur-attention-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 14px;border:1px solid #e4eaf1;border-radius:12px;background:#fff}
+.cltur-attention-main{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cltur-attention-main b{color:#193957}
+.cltur-attention-main span,.cltur-attention-main small{font-size:12px;color:#6b7b8f}
+.cltur-attention-main small{color:#9a5b16}
+.cltur-attention-actions{display:flex;gap:7px;flex-wrap:wrap}
+.cltur-attention-actions .btn{white-space:nowrap}
+.cltur-operations-empty{padding:18px;background:#f4f8f5;border-radius:12px;color:#42634b}
+@media(max-width:640px){.cltur-operations-stats{grid-template-columns:1fr 1fr}.cltur-operations-stats>div:last-child{grid-column:1/-1}.cltur-attention-item{align-items:flex-start;flex-direction:column}.cltur-attention-actions{width:100%}.cltur-attention-actions .btn{flex:1}}
+</style>
 </head><body>
 <div class="app"><aside class="side"><div class="brand"><img class="cltur-sidebar-logo" src="./icons/cltur-logo.png" alt="Logo CL TUR"><div><b>CL TUR</b><br><small>Transporte & Turismo</small></div></div><nav class="nav"><button data-page="dashboard" class="active">📊 Dashboard</button><button data-page="trips">🚌 Excursões</button><button data-page="people">👥 Passageiros</button><button data-page="charters">🚐 Fretamentos</button><button data-page="finance">💰 Financeiro</button><button data-page="calendar">📅 Calendário</button><button data-page="public">🌐 Área do cliente</button><button data-page="trash">🗑️ Lixeira</button><button data-page="archive">📁 Arquivo</button></nav></aside><main class="main" id="main"></main></div><div style="position:fixed;bottom:8px;right:14px;font-size:11px;color:#98a2b3;pointer-events:none">CL TUR • Sistema administrativo</div>
 <div id="modal" class="modal hidden"></div>
@@ -1322,6 +1342,20 @@ function dashboard(){
   const projected=totalRevenue-plannedCosts-expenses;
   const openCharters=data.charters.filter(c=>!['Concluído','Cancelado'].includes(c.status)).length;
   const pendingPeople=data.people.filter(p=>paymentStatus(p)==='Parcial'||paymentStatus(p)==='Pendente').length;
+  const operationalItems=upcoming.map(t=>{
+    const total=totalSeats(t),occ=occupied(t.id),free=Math.max(0,total-occ);
+    const pct=total?Math.round((occ/total)*100):0;
+    const tripPeople=data.people.filter(p=>String(p.tripId)===String(t.id));
+    const pendingCount=tripPeople.filter(p=>['Parcial','Pendente'].includes(paymentStatus(p))).length;
+    const pendingValue=tripPeople.reduce((a,p)=>a+Math.max(0,Number(p.value||0)-paymentTotal(p)),0);
+    const days=Math.ceil((new Date((t.departure||'9999-12-31')+'T00:00:00').getTime()-today.getTime())/86400000);
+    return {trip:t,total,occ,free,pct,pendingCount,pendingValue,days};
+  });
+  const attentionItems=operationalItems.filter(x=>x.days<=30&&(
+    (x.total>0&&x.free<=Math.max(2,Math.ceil(x.total*.15)))||x.pendingCount>0
+  )).slice(0,6);
+  const nearFullCount=operationalItems.filter(x=>x.total>0&&x.free<=Math.max(2,Math.ceil(x.total*.15))).length;
+  const upcomingMonthCount=operationalItems.filter(x=>x.days<=30).length;
 
   const nextRows=upcoming.slice(0,6).map(t=>{
     const total=totalSeats(t), occ=occupied(t.id), free=Math.max(0,total-occ);
@@ -1330,7 +1364,7 @@ function dashboard(){
       <td><b>${esc(t.destination)}</b><br><small>${esc(t.origin||'')}</small></td>
       <td>${fmt(t.departure)}${t.time?' · '+esc(t.time):''}</td>
       <td>${(t.vehicles||[]).map(v=>esc(v.type)+' ('+v.seats+')').join(' + ')}</td>
-      <td><b>${free}</b> / ${total}<br><small>${pct}% ocupados</small></td>
+      <td><b>${free}</b> / ${total}<br><small>${pct}% ocupados</small><div class="cltur-occupancy-track"><i style="width:${pct}%"></i></div></td>
       <td><div class="action-buttons"><button class="btn secondary" onclick="tripFinance('${t.id}')">💰 Financeiro</button><button class="btn secondary" onclick="seatMap('${t.id}')">💺 Assentos</button></div></td>
     </tr>`;
   }).join('');
@@ -1369,12 +1403,27 @@ function dashboard(){
       <div class="card"><div class="kpi-icon">📈</div><div class="kpi-label">Resultado atual</div><strong class="${currentResult>=0?'result-positive':'result-negative'}">${money(currentResult)}</strong></div>
     </div>
 
+    <div class="panel cltur-operations-panel">
+      <div class="section-heading"><div><h2>🎯 Atenção operacional</h2><p class="muted">Excursões dos próximos 30 dias com lotação próxima do limite ou pagamentos pendentes.</p></div><span class="mini-pill">${attentionItems.length} ponto(s)</span></div>
+      <div class="cltur-operations-stats">
+        <div><b>${upcomingMonthCount}</b><span>saídas em até 30 dias</span></div>
+        <div><b>${nearFullCount}</b><span>excursões próximas da lotação</span></div>
+        <div><b>${pendingPeople}</b><span>passageiros com saldo em aberto</span></div>
+      </div>
+      ${attentionItems.length?'<div class="cltur-attention-list">'+attentionItems.map(x=>{
+        const reasons=[];
+        if(x.total>0&&x.free<=Math.max(2,Math.ceil(x.total*.15)))reasons.push(x.free===0?'Lotação atingida':x.free+' vaga(s) restante(s)');
+        if(x.pendingCount)reasons.push(x.pendingCount+' passageiro(s) com saldo · '+money(x.pendingValue));
+        return '<article class="cltur-attention-item"><div class="cltur-attention-main"><b>'+esc(x.trip.destination)+'</b><span>'+fmt(x.trip.departure)+(x.days===0?' · Hoje':x.days===1?' · Amanhã':' · Em '+x.days+' dias')+'</span><small>'+reasons.join(' • ')+'</small></div><div class="cltur-attention-actions"><button class="btn secondary" onclick="tripFinance(\''+x.trip.id+'\')">Financeiro</button><button class="btn secondary" onclick="peopleDetail(\''+x.trip.id+'\')">Passageiros</button></div></article>';
+      }).join('')+'</div>':'<div class="empty cltur-operations-empty">Nenhum ponto crítico identificado nas próximas saídas. Bom trabalho! ✅</div>'}
+    </div>
+
     <div class="panel">
       <div class="section-heading" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
         <div><h2>Próximas excursões</h2><p class="muted">Acompanhe ocupação, veículos e ações rápidas.</p></div>
         <button class="btn" onclick="tripForm()">+ Nova excursão</button>
       </div>
-      ${upcoming.length?`<div class="dashboard-upcoming-mobile" style="display:none">${upcoming.slice(0,6).map(t=>{const total=totalSeats(t),occ=occupied(t.id),free=Math.max(0,total-occ),pct=total?Math.round(occ/total*100):0;return `<article class="dashboard-upcoming-card"><h3>${esc(t.destination)}</h3><p>${esc(t.origin||'Origem a confirmar')}</p><div class="dashboard-upcoming-meta"><span>📅 ${fmt(t.departure)}${t.time?' · '+esc(t.time):''}</span><span>🚌 ${(t.vehicles||[]).map(v=>esc(v.type)+' ('+v.seats+')').join(' + ')||'A definir'}</span><span>🪑 ${free} de ${total} vagas</span><span>📊 ${pct}% ocupados</span></div><div class="dashboard-upcoming-actions"><button class="btn secondary" onclick="tripFinance('${t.id}')">💰 Financeiro</button><button class="btn secondary" onclick="seatMap('${t.id}')">💺 Assentos</button></div></article>`}).join('')}</div><div class="dashboard-upcoming-desktop" style="overflow:auto"><table class="table"><tr><th>Destino</th><th>Saída</th><th>Veículos</th><th>Vagas</th><th></th></tr>${nextRows}</table></div>`:'<div class="empty">Nenhuma excursão futura cadastrada.</div>'}
+      ${upcoming.length?`<div class="dashboard-upcoming-mobile" style="display:none">${upcoming.slice(0,6).map(t=>{const total=totalSeats(t),occ=occupied(t.id),free=Math.max(0,total-occ),pct=total?Math.round(occ/total*100):0;return `<article class="dashboard-upcoming-card"><h3>${esc(t.destination)}</h3><p>${esc(t.origin||'Origem a confirmar')}</p><div class="dashboard-upcoming-meta"><span>📅 ${fmt(t.departure)}${t.time?' · '+esc(t.time):''}</span><span>🚌 ${(t.vehicles||[]).map(v=>esc(v.type)+' ('+v.seats+')').join(' + ')||'A definir'}</span><span>🪑 ${free} de ${total} vagas</span><span>📊 ${pct}% ocupados</span><div class="cltur-occupancy-track"><i style="width:${pct}%"></i></div></div><div class="dashboard-upcoming-actions"><button class="btn secondary" onclick="tripFinance('${t.id}')">💰 Financeiro</button><button class="btn secondary" onclick="seatMap('${t.id}')">💺 Assentos</button></div></article>`}).join('')}</div><div class="dashboard-upcoming-desktop" style="overflow:auto"><table class="table"><tr><th>Destino</th><th>Saída</th><th>Veículos</th><th>Vagas</th><th></th></tr>${nextRows}</table></div>`:'<div class="empty">Nenhuma excursão futura cadastrada.</div>'}
     </div>
 
     <div class="cards">
