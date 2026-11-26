@@ -790,6 +790,9 @@ input:focus,select:focus,textarea:focus{border-color:#80aef2!important;box-shado
 #cltur-auth-screen{background:radial-gradient(circle at 12% 15%,#e4efff 0,transparent 34%),linear-gradient(135deg,#f5f8fc,#edf3fb)!important;padding:24px!important}
 .cltur-auth-card{display:grid!important;grid-template-columns:minmax(260px,.88fr) minmax(340px,1.12fr)!important;width:min(900px,100%)!important;max-height:calc(100vh - 48px)!important;overflow:auto!important;padding:0!important;border:1px solid #e1eaf5!important;border-radius:25px!important;box-shadow:0 28px 80px rgba(31,61,101,.15)!important}
 .cltur-login-welcome{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;min-height:540px;padding:48px 42px;color:#fff;background:linear-gradient(145deg,#143d70 0%,#2368bd 58%,#4388e8 100%)}
+.cltur-login-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.78}
+.cltur-login-welcome:after{z-index:1;background:linear-gradient(180deg,rgba(8,27,52,.18),rgba(8,27,52,.78));border:0;border-radius:0;inset:0;width:auto;height:auto;right:0;bottom:0}
+.cltur-login-welcome>*:not(.cltur-login-video){position:relative;z-index:2}
 .cltur-login-welcome:before,.cltur-login-welcome:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.13);border-radius:50%;pointer-events:none}
 .cltur-login-welcome:before{width:360px;height:360px;right:-190px;top:-110px}
 .cltur-login-welcome:after{width:260px;height:260px;right:-120px;bottom:-130px}
@@ -821,9 +824,12 @@ input:focus,select:focus,textarea:focus{border-color:#80aef2!important;box-shado
 @media(max-width:700px){
  #cltur-auth-screen{padding:14px!important;align-items:center!important}
  .cltur-auth-card{display:block!important;width:min(440px,100%)!important;max-height:calc(100vh - 28px)!important;border-radius:21px!important}
- .cltur-login-welcome{display:none!important}
- .cltur-login-form-area{padding:34px 26px 28px!important}
- .cltur-login-mobile-brand{display:flex;align-items:center;gap:10px;margin-bottom:30px;color:#1d4f91;font-size:21px}
+ .cltur-login-welcome{display:flex!important;min-height:158px!important;padding:24px 26px!important;justify-content:center!important;align-items:flex-start!important}
+ .cltur-login-mark,.cltur-login-divider,.cltur-login-welcome h1,.cltur-login-welcome p,.cltur-login-foot{display:none!important}
+ .cltur-login-brand{font-size:25px!important}
+ .cltur-login-tag{font-size:9px!important}
+ .cltur-login-form-area{padding:28px 26px 28px!important}
+ .cltur-login-mobile-brand{display:none!important}
  .cltur-login-mobile-brand span{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#edf4ff;font-size:22px}
  .cltur-login-form-area h2{font-size:25px}
  .cltur-login-instruction{margin-bottom:20px}
@@ -1094,6 +1100,7 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif!important;letter-spacing:.005
 <div id="cltur-auth-screen">
   <form class="cltur-auth-card" id="cltur-auth-form">
     <section class="cltur-login-welcome">
+      <video class="cltur-login-video" autoplay muted loop playsinline preload="auto" aria-hidden="true"><source src="./assets/video-abertura.mp4" type="video/mp4"></video>
       <div class="cltur-login-mark" aria-hidden="true">🚌</div>
       <div class="cltur-login-brand">CL TUR</div>
       <div class="cltur-login-tag">TRANSPORTE & TURISMO</div>
