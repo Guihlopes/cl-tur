@@ -1940,7 +1940,8 @@ function cashDayData(date){
   const costs=expenses.reduce((a,e)=>a+Number(e.value||0),0);
   return {payments,expenses,receipts,costs,net:receipts-costs};
 }
-function dailyCashflow(date=new Date().toISOString().slice(0,10)){
+function clturLocalDate(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function dailyCashflow(date=clturLocalDate()){
   const day=cashDayData(date);
   const closing=(data.cashClosings||[]).find(x=>x.date===date);
   const paymentRows=day.payments.map(p=>{
